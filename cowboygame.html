@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cowboy Game</title>
+<link rel="stylesheet" href="cowboy.css">
+</head>
+<body onkeydown="myHandler(event)" onkeyup="myHandler2(event)">
+<div id="score" style="background-color:#CC99FF"></div>
+<div id="Result"></div>
+<canvas id="canvas" width="1200" height="550" style="border:5px solid black"></canvas>
+<br>
+<script>
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+var frame;
+var current=-1;
+var count=0;
+var gravity=0.1;
+var bloodcount=0;
+/*var portalsystem=
+{
+	radius:25,
+	color:'white',
+	number: 10,
+	portal:[],
+	draw :function()
+	{
+		for(var i=0;i<this.number;i++)
+		{
+			ctx.fillStyle = this.color;
+			ctx.beginPath();
+			ctx.arc(this.portal[i].x,this.portal[i].y,this.radius, 0, Math.PI * 2, false);
+			ctx.closePath();
+			ctx.fill();
+		}
+		
+	}
+};*/
+var particlesystem=
+{
+	life:10,
+	radius:0.7,
+	color: 'red',
+	number:50,
+	particle:[],
+	draw :function()
+	{
+		for(var i=0;i<this.number;i++)
+		{   
+			ctx.fillStyle = this.color;
+			ctx.beginPath();
+			ctx.arc(this.particle[i].x,this.particle[i].y,this.radius, 0, Math.PI *2, false);
+			ctx.closePath();
+			ctx.fill();
+		}
+	}
+};
+var player =
+{
+	radius:10,
+	color:'lightblue',
+	draw :function()
+	{
+		ctx.fillStyle = this.color;
+		ctx.beginPath();
+		ctx.arc(this.x,this.y,this.radius, 0, Math.PI * 2, false);
+		ctx.closePath();
+		ctx.fill();
+	}
+}; 
+var vertical_roads = 
+{
+	height:canvas.height,
+	width:50,
+	color:'#f26c68',
+	number:8,
+	roads:[],
+	draw : function()
+	{
+		for(var i=0;i<this.number;i++)
+		{
+			ctx.fillStyle = this.color;
+			ctx.fillRect(this.roads[i].x,0,this.width,this.height);
+		}
+	}
+};
+var horizontal_roads = 
+{
+	height:50,
+	width:canvas.width,
+	color:'#f26c68',
+	number:4,
+	roads:[],
+	draw : function()
+	{
+		for(var i=0;i<this.number;i++)
+		{
+			ctx.fillStyle = this.color;
+			ctx.fillRect(0,this.roads[i].y,this.width,this.height);
+		}
+	}
+};
+
+var cows_details =
+{
+	height:25,
+	width:25,
+	color:'#ffd2e8',
+	number:12,
+	cows:[],
+	draw :function()
+	{
+		for(var i=0;i<this.cows.length;i++)
+		{
+			ctx.fillStyle = this.color;
+			ctx.fillRect(this.cows[i].x,this.cows[i].y,this.width,this.height);
+		}
+	}
+}; 
+
+function draw() 
+{
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+	if(bloodcount>0)
+	bloodcount--;
+	for(var i=0;i<cows_details.cows.length;i++)
+    {
+       cows_details.cows[i].x += cows_details.cows[i].vx; 
+	   cows_details.cows[i].y += cows_details.cows[i].vy;
+	   if(cows_details.cows[i].x>canvas.width)
+	   cows_details.cows[i].x=-10;
+	   if(cows_details.cows[i].y>canvas.height)
+	   cows_details.cows[i].y=-10;
+	   for(var j=0;j<i;j++)
+       { 
+			if((Math.abs(cows_details.cows[i].x - cows_details.cows[j].x)<=25)&&(Math.abs(cows_details.cows[i].y - cows_details.cows[j].y)<=25))
+			{     
+			    for(var k=0;k<particlesystem.number;k++)
+				{
+					particlesystem.particle[k].x=(cows_details.cows[i].x+cows_details.cows[j].x+cows_details.width)/2;
+					particlesystem.particle[k].y=(cows_details.cows[i].y+cows_details.cows[j].y+cows_details.width)/2;
+				}
+			    bloodcount=30;  
+	     		if(j<8)
+				{
+					cows_details.cows[j].y=-canvas.height/4; 
+					cows_details.cows[i].x=-canvas.width/8;
+				}
+		 		if(i==current||j==current)
+		 		{
+		 			player.x=canvas.width/8;
+         			player.y=220;
+					count++;
+		 		}
+	     		i--;
+		 		j--;
+	     		break;
+	     	}
+	    }
+   	}
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+    vertical_roads.draw();
+	horizontal_roads.draw();
+	cows_details.draw();
+	player.draw();
+	//portalsystem.draw();
+	if(bloodcount>0)
+	{
+		for(var i=0;i<particlesystem.number;i++)
+		{
+			particlesystem.particle[i].y=particlesystem.particle[i].y+particlesystem.particle[i].vy+gravity;
+			particlesystem.particle[i].x=particlesystem.particle[i].x+particlesystem.particle[i].vx;
+		}
+		particlesystem.draw();
+	}
+	if(player.x>(canvas.width-35) && player.y>=(canvas.height-35))
+	{
+		document.getElementById('Result').style.display='block';
+		document.getElementById('Result').innerHTML="You've completed this level";
+		cancelAnimationFrame('Frame');
+		return;
+	}
+	frame = window.requestAnimationFrame(draw);
+}
+/*function bloodsplatter()
+				  {
+				    if(particlesystem.life==0)
+					clearInterval(blood);
+					particlesystem.draw();
+					for(var i=0;i<50;i++)
+					{
+						particlesystem.particle[i].y=particlesystem.particle[i].y+particlesystem.particle[i].vy+gravity;
+						particlesystem.particle[i].x=particlesystem.particle[i].x+particlesystem.particle[i].vx;
+					}
+					particlesystem.life--;
+				  }*/
+function myHandler(event) 
+{
+    var key = event.which;
+    if (key> 46) 
+    {
+		return;
+    }
+    switch (key) 
+	{
+		case 32://console.log("hello");
+		        //console.log(player);		 
+				for(var i=0;i<cows_details.cows.length;i++)
+				{      
+					//console.log("Cow "+i);
+					//console.log(cows_details.cows[i]);
+                   	if((Math.abs(player.x - cows_details.cows[i].x)<25) && (Math.abs(player.y - cows_details.cows[i].y)<25))
+			        {
+						player.x=cows_details.cows[i].x+(cows_details.width/2);
+						player.y=cows_details.cows[i].y+(cows_details.height/2);
+						//console.log(player.x+" "+player.y);
+					  	if(player.x>canvas.width)
+					    {
+					    	//console.log("Hello");
+					    	player.x=-10;
+					    }
+					  	
+					  	if(player.y>canvas.height)
+					  	player.y=-10;
+					  	current=i;
+			          	//player.x+=cows_details.cows[i].vx;
+					  	//console.log(player.x+" "+cows_details.cows[i].x)
+					}
+				}
+                break;
+ 
+        default:break;
+         
+    }
+}
+function myHandler2(event) 
+{
+    var key = event.which;
+    if (key==32) 
+		current=-1;
+}		
+window.onload= function()
+{
+	/*for(var i=0;i<10;i++)
+	{
+		portalsystem.portal[i]={};
+		if(i<8)
+		{
+			portalsystem.portal[i].x=150*i+100;
+			portalsystem.portal[i].y=canvas.height/8*i;
+		}
+		else
+		{
+			portalsystem.portal[i].y=125*i+75;
+			portalsystem.portal[i].x=canvas.width/4*i;
+		}
+		
+	}*/
+    for(var i=0;i<particlesystem.number;i++)
+		{   
+		    particlesystem.particle[i]={};
+			particlesystem.particle[i].vx=Math.random()*2-1;
+			particlesystem.particle[i].vy=Math.random()*2-1;
+		}
+	for(var i=0;i<vertical_roads.number;i++)
+  	{ 
+   		vertical_roads.roads[i] = {};
+   		vertical_roads.roads[i].x=150*i+100;
+   		cows_details.cows[i] = {};
+   		cows_details.cows[i].x = 150*i+112;
+   		cows_details.cows[i].y = -250*(Math.random());
+   		cows_details.cows[i].vx=0;
+   		cows_details.cows[i].vy=3;
+   	}
+	for(var i=0;i<horizontal_roads.number;i++)
+  	{ 
+   		horizontal_roads.roads[i] = {};
+   		horizontal_roads.roads[i].y=125*i+75;
+   		cows_details.cows[vertical_roads.number+i] = {};
+   		cows_details.cows[vertical_roads.number+i].y=125*i+87;
+   		cows_details.cows[vertical_roads.number+i].x = -250*(Math.random());
+   		cows_details.cows[vertical_roads.number+i].vx=3;
+   		cows_details.cows[vertical_roads.number+i].vy=0;
+   	}
+	player.x=120;
+	player.y=220;
+	player.dx=1.5;
+	player.dy=1;
+	vertical_roads.draw();
+	horizontal_roads.draw();
+	cows_details.draw();
+	player.draw();
+	//portalsystem.draw();
+	frame = window.requestAnimationFrame(draw);
+}
+</script>
+</body>
+</html>
