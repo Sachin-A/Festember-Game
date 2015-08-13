@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cowboy Game</title>
+ <style>
+body
+{
+    background-color: Crimson;
+    padding:20px;
+}
+#canvas 
+{
+	background-color: white;
+    padding: 0;
+    margin: auto;
+    display: block;
+    width:1200; 
+	height:550;
+    position:absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+#Result 
+{
+	font-size:24px;
+	font-family: Papyrus, fantasy;
+	background-color:rgba(54, 161, 255, 0.8);
+	display:none; 
+	position:absolute; 
+	z-index:1; 
+	left:50%; 
+	top:50%;
+    margin:-100px 0 0 -150px;	
+	padding:5%;
+}
+ </style> 
+</head>
+<body onkeydown="myHandler(event)">
+<canvas id="canvas" width="1200" height="550" ></canvas>
+<div id="Result"></div>
+<br>
+<script>
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+var current=0;
+var portalsystem=
+{
+	radius:25,
+	blueportal:{},
+	redportal:{},
+	draw :function()
+	{
+			ctx.fillStyle = this.redportal.color;
+			ctx.beginPath();
+			ctx.arc(this.redportal.x,this.redportal.y,this.radius, 0, Math.PI * 2, false);
+			ctx.closePath();
+			ctx.fill();
+			ctx.fillStyle = this.blueportal.color;
+			ctx.beginPath();
+			ctx.arc(this.blueportal.x,this.blueportal.y,this.radius, 0, Math.PI * 2, false);
+			ctx.closePath();
+			ctx.fill();
+	}
+};
+var player =
+{
+	radius:10,
+	color:'black',
+	draw :function()
+	{
+		ctx.fillStyle = this.color;
+		ctx.beginPath();
+		ctx.arc(this.x,this.y,this.radius, 0, Math.PI * 2, false);
+		ctx.closePath();
+		ctx.fill();
+	}
+}; 
+function draw() 
+{
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+	if(player.x>(portalsystem.blueportal.x-portalsystem.radius) && player.x<(portalsystem.blueportal.x+portalsystem.radius) && player.y>(portalsystem.blueportal.y-portalsystem.radius) && player.y<(portalsystem.blueportal.y+portalsystem.radius) && current==0)
+	{
+		//alert("Blue");
+		player.x=portalsystem.redportal.x;
+		player.y=portalsystem.redportal.y;
+		current=1;
+	}
+	else if(player.x>(portalsystem.redportal.x-portalsystem.radius) && player.x<(portalsystem.redportal.x+portalsystem.radius) && player.y>(portalsystem.redportal.y-portalsystem.radius) && player.y<(portalsystem.redportal.y+portalsystem.radius) && current==0)
+	{
+	    //alert("Red");
+		player.x=portalsystem.blueportal.x;
+		player.y=portalsystem.blueportal.y;
+		current=1;
+	}
+	else if(player.x!=portalsystem.blueportal.x && player.y!=portalsystem.blueportal.y && player.x!=portalsystem.redportal.x && player.y!=portalsystem.redportal.y)current=0;
+	portalsystem.draw();
+	player.draw();
+	
+	if(player.x>(canvas.width-35) && player.y>=(canvas.height-35))
+	{
+		document.getElementById('Result').style.display='block';
+		document.getElementById('Result').innerHTML="You've completed this level";
+		cancelAnimationFrame('Frame');
+		return;
+	}
+	frame = window.requestAnimationFrame(draw);
+}
+function myHandler(event) 
+{
+    var key = event.which;
+    if (key> 46) 
+    {
+		return;
+    }
+    switch (key) 
+	{
+		case 37:player.x -= player.vx;
+				var playerleft = player.x - player.radius;
+				if (playerleft <= 0) 
+					player.x=canvas.width;          
+				break;
+    
+		case 38:player.y -= player.vy;
+				var playerup = player.y - player.radius;
+				if (playerup <= 0) 
+					player.y = canvas.height;
+				break;
+        
+		case 39:player.x += player.vx;
+				var playerright = player.x + player.radius;
+				if (playerright >= canvas.width)
+					player.x = 0;           
+				break;
+        
+		case 40:player.y += player.vy;
+				var playerdown = player.y + player.radius;
+				if (playerdown >= canvas.height)
+					player.y = 0;
+				break;
+		
+		case 82:if(portalsystem.redportal.exist==0)
+			        {
+						portalsystem.redportal.x=player.x+(2*player.radius);
+						portalsystem.redportal.y=player.y;
+					  	portalsystem.redportal.exist=1;
+					}
+				else if(portalsystem.redportal.exist==1)
+				    	portalsystem.redportal.x+=portalsystem.redportal.vx;
+                break;
+		
+		case 66:console.log("Burp blue");
+				if(portalsystem.blueportal.exist==0)
+			        {
+						portalsystem.blueportal.x=player.x+(2*player.radius);
+						portalsystem.blueportal.y=player.y;
+					  	portalsystem.blueportal.exist=1;
+					}
+				else if(portalsystem.blueportal.exist==1)
+				    	portalsystem.blueportal.x+=portalsystem.blueportal.vx;
+                break;
+ 
+        default:break;
+         
+    }
+}
+window.onload= function()
+{
+	//player.x=canvas.width/8;
+	//player.y=canvas.height/4;
+	player.vx=1;
+	player.vy=1;
+	player.x=50;
+	player.y=50;
+	portalsystem.redportal.x=100;
+	portalsystem.redportal.y=100;
+	portalsystem.blueportal.x=canvas.width-40;
+	portalsystem.blueportal.y=canvas.height-40;
+	portalsystem.redportal.vx=1;
+	portalsystem.redportal.vy=1;
+	portalsystem.blueportal.vx=1;
+	portalsystem.blueportal.vy=1;
+	portalsystem.redportal.exist=0;
+	portalsystem.blueportal.exist=0;
+	portalsystem.redportal.color='Crimson';
+	portalsystem.blueportal.color='rgba(54, 161, 255, 0.8)';
+	player.draw();
+	frame = window.requestAnimationFrame(draw);
+}
+</script>
+</body>
+</html>
