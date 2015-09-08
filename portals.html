@@ -41,6 +41,8 @@
     //conveyor variable
     var attached = 0;
     var toattach = 0;
+	var levattach=0;
+	var levattached=0;
     //ray variables
     var currentRayAngle = 0;
     var input = new b2RayCastInput();
@@ -175,6 +177,7 @@
         switch (keycode) {
             case 32: //console.log("We're in key");
                 toattach = 1;
+				levattach=1;
                 break;
             case 37:
                 var mass = wheel.GetMass() * 10;
@@ -216,6 +219,8 @@
             case 32: //console.log("We're in key");
                 toattach = 0;
                 attached = 0;
+				levattach=0;
+				levattached=0;
                 break;
             case 80:
                 scope = 0;
@@ -239,7 +244,6 @@
     world.SetDebugDraw(debugDraw);
     var winx = 10*scale;
     var winy = 45*scale;
-
     function level1() {
         console.log("Inside level1");
         
@@ -485,11 +489,135 @@
     }
         function level2()
         {
+			for (b = world.GetBodyList() ; b; b = b.GetNext()) {
+			if(b!=wheel)
+			world.DestroyBody(b);}
             console.log("Second level");
+			var bodyDef = new b2BodyDef;
+            bodyDef.type = b2Body.b2_staticBody;
+            bodyDef.position.Set(5 * xlimit / 1200, (ylimit / scale) - (1 * ylimit / 900));
+
+            var fd = new b2FixtureDef;
+            fd.shape = new b2PolygonShape;
+            fd.shape.SetAsBox(5 * xlimit / 1200, 1 * ylimit / 900);
+
+            var ground1 = world.CreateBody(bodyDef);
+            ground1.CreateFixture(fd);
+			
+			// Tile 1
+            var bodyDef = new b2BodyDef;
+            bodyDef.type = b2Body.b2_staticBody;
+            bodyDef.position.Set(25 * xlimit / 1200, (ylimit / scale) - (15 * ylimit / 900));
+
+            var fd = new b2FixtureDef;
+            fd.shape = new b2PolygonShape;
+            fd.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 2);
+			
+
+            var tile1 = world.CreateBody(bodyDef);
+            tile1.CreateFixture(fd);
+			
+			// Tile 2
+            var bodyDef = new b2BodyDef;
+            bodyDef.type = b2Body.b2_staticBody;
+            bodyDef.position.Set(13 * xlimit / 1200, (ylimit / scale) - (5 * ylimit / 900));
+
+            var fd = new b2FixtureDef;
+            fd.shape = new b2PolygonShape;
+            fd.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 2);
+			
+
+            var tile2 = world.CreateBody(bodyDef);
+            tile2.CreateFixture(fd);
+			
+			// Tile 3
+            var bodyDef = new b2BodyDef;
+            bodyDef.type = b2Body.b2_staticBody;
+            bodyDef.position.Set(19 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+
+            var fd = new b2FixtureDef;
+            fd.shape = new b2PolygonShape;
+            fd.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 2);
+			
+
+            var tile3 = world.CreateBody(bodyDef);
+            tile3.CreateFixture(fd);
+			
+			// Tile 4
+            var bodyDef = new b2BodyDef;
+            bodyDef.type = b2Body.b2_staticBody;
+            bodyDef.position.Set(31 * xlimit / 1200, (ylimit / scale) - (20 * ylimit / 900));
+
+            var fd = new b2FixtureDef;
+            fd.shape = new b2PolygonShape;
+            fd.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 2);
+			
+
+            var tile4 = world.CreateBody(bodyDef);
+            tile4.CreateFixture(fd);
+
+			
+			xincrease=1;
+			function movetile()
+			{
+				xincrease=xincrease+1;
+				for (b = world.GetBodyList() ; b; b = b.GetNext())
+				if(b==tile1||b==tile2||b==tile3||b==tile4)
+				b.SetAngle(xincrease * (Math.PI / 180));
+			}
+			var debugDraw = new b2DebugDraw();
+			debugDraw.SetSprite(document.getElementById("canvas").getContext("2d"));
+			debugDraw.SetDrawScale(30); //define scale
+			debugDraw.SetFillAlpha(1); //define transparency
+			debugDraw.SetLineThickness(1);
+			debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+			//debugDraw.SetFlags(b2DebugDraw.e_shapeBit);
+			world.SetDebugDraw(debugDraw);
+			
+			function attach2() {
+            for (b = world.GetBodyList() ; b; b = b.GetNext())
+                if (b==tile1||b==tile2||b==tile3||b==tile4)
+				{
+					if (Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 7 * xlimit / 1200 && levattached==0) 
+					{
+                            var set = new b2Vec2(b.GetPosition().x, b.GetPosition().y - 2);
+                            //console.log("Attached in A=" + attached);
+                            wheel.SetPosition(set);
+							levattached=1;
+					}
+				}
+                    
+        }
+			
+			update2();
+			function update2()
+            {
+                world.Step(1 / 60, 10, 10);
+                /*if(attached == 1)
+                    wheel.ApplyForce(new b2Vec2(0 * wheel.GetMass(), -10 * wheel.GetMass()), wheel.GetPosition());*/
+                world.DrawDebugData();
+                world.ClearForces();
+				movetile();
+				if(levattach==1)
+					attach2();
+                //conveyor_motion();
+				/*portals();
+				if(portalsystem.redportal.exist==1||portalsystem.blueportal.exist==1)
+				portalsystem.draw();
+				if(portalsystem.redportal.exist==1&&portalsystem.blueportal.exist==1)
+				portalsystem.draw();*/
+                if(scope == 1)
+                    ray();
+                /*if(wheel.GetPosition() == win)
+                {
+                    cancelAnimationFrame(frame);
+                }*/
+                var frame2 = window.requestAnimationFrame(update2);
+            };
         }
     function game() {
         //startup();
-        level1();
+        level2();
         //console.log("Outside level1");
         //level2();
         /*level3();
