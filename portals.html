@@ -22,46 +22,7 @@
 		<canvas id="canvas" style="background-color:rgba(0, 0, 0, 0.5)"></canvas>
 	</body>
 	<script>
-		
-		//function initialisations
-		var b2Vec2 = Box2D.Common.Math.b2Vec2,
-			b2BodyDef = Box2D.Dynamics.b2BodyDef,
-			b2Body = Box2D.Dynamics.b2Body,
-			b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
-			b2World = Box2D.Dynamics.b2World,
-			b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape,
-			b2CircleShape = Box2D.Collision.Shapes.b2CircleShape,
-			b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef,
-			b2MouseJointDef = Box2D.Dynamics.Joints.b2MouseJointDef,
-			b2DebugDraw = Box2D.Dynamics.b2DebugDraw,
-			b2Fixture = Box2D.Dynamics.b2Fixture,
-			b2RayCastInput = Box2D.Collision.b2RayCastInput,
-			b2RayCastOutput = Box2D.Collision.b2RayCastOutput,
-			b2AABB = Box2D.Collision.b2AABB;
-			
-		//world variable
-		var world = new b2World(new b2Vec2(0, 10), true);
-		
-		//anti-gravity variable
-		var attract = new b2Vec2(0, -10);
-		
-		//ray variables
-		var currentRayAngle = 0;
-		var input = new b2RayCastInput();
-		var output = new b2RayCastOutput();
-		var b = new b2BodyDef();
-		var f = new b2FixtureDef();
-		var closestFraction = 1;
-		var intersectionNormal = new b2Vec2(0, 0);
-		var intersectionPoint = new b2Vec2();
-		var rayLength = 25; //long enough to hit the walls
-		var p2 = new b2Vec2();
-		var normalEnd = new b2Vec2();
-		var scope = 0;
-		
-		//portal variable
-		var current = 0;
-		
+	
 		//canvas variables
 		var canvas = document.getElementById('canvas');
 		var ctx = canvas.getContext('2d');
@@ -86,15 +47,56 @@
 		var xylimit = ylimit * xlimit;
 		var scale = 30;
 		
-		//conveyor and attach variables
+		//function initialisations
+		var b2Vec2 = Box2D.Common.Math.b2Vec2,
+			b2BodyDef = Box2D.Dynamics.b2BodyDef,
+			b2Body = Box2D.Dynamics.b2Body,
+			b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
+			b2World = Box2D.Dynamics.b2World,
+			b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape,
+			b2CircleShape = Box2D.Collision.Shapes.b2CircleShape,
+			b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef,
+			b2MouseJointDef = Box2D.Dynamics.Joints.b2MouseJointDef,
+			b2DebugDraw = Box2D.Dynamics.b2DebugDraw,
+			b2Fixture = Box2D.Dynamics.b2Fixture,
+			b2RayCastInput = Box2D.Collision.b2RayCastInput,
+			b2RayCastOutput = Box2D.Collision.b2RayCastOutput,
+			b2AABB = Box2D.Collision.b2AABB;
+			
+		//world variable
+		var world = new b2World(new b2Vec2(0, 10), true);
+		
+		//anti-gravity variable
+		var attract = new b2Vec2(0, -10);
+		
+		//ray variables
 		var rayLength = xlimit; //long enough to hit the walls
+		var currentRayAngle = 0;
+		var input = new b2RayCastInput();
+		var output = new b2RayCastOutput();
+		var b = new b2BodyDef();
+		var f = new b2FixtureDef();
+		var closestFraction = 1;
+		var intersectionNormal = new b2Vec2(0, 0);
+		var intersectionPoint = new b2Vec2();
+		var p2 = new b2Vec2();
+		var normalEnd = new b2Vec2();
+		var scope = 0;
+		var DEGTORAD = Math.PI / 180;
+		var count=0;
+		var circle=0;
+		
+		//portal variable
+		var current = 0;
+		
+		//conveyor and attach variables
 		var attached = 0;
 		var toattach = 0;
 		var levattach = 0;
 		var levattached = 0;
-		var move1 = new b2Vec2(2*xlimit/1200, 0);
-		var move2 = new b2Vec2(0, -6 * ylimit / 900);
-		var move3 = new b2Vec2(-3 * xlimit / 1200, 0);
+		var move1 = new b2Vec2(7*xlimit/1200, 0);
+		var move2 = new b2Vec2(0, -8 * ylimit / 900);
+		var move3 = new b2Vec2(-10 * xlimit / 1200, 0);
 		var zero = new b2Vec2(0, 0);
 		
 		//Player: Circle
@@ -115,32 +117,37 @@
 		var wheel = world.CreateBody(bodyDef);
 		wheel.CreateFixture(fixDef);
 		
-		//Assigning wheel's position as the beginning point of raycasting
-		var p1 = wheel.GetPosition(); //center of scene
+		//Assigning wheel's position as the beginning point of ray casting
+		var p1 = wheel.GetPosition(); //centre of scene
 		
 		//GLOBAL: portals function to exchange position
 		function portals()
 		{
-			if (Math.sqrt(Math.pow(wheel.GetPosition().x - portalsystem.blueportal.x, 2) + Math.pow(wheel.GetPosition().y - portalsystem.blueportal.y, 2)) <= 15 * xlimit / 1200 && current == 0)
+			if (Math.sqrt(Math.pow(wheel.GetPosition().x*scale - portalsystem.blueportal.x, 2) + Math.pow(wheel.GetPosition().y*scale - portalsystem.blueportal.y, 2)) <= scale*xlimit / 1200 && current == 0)
 			{
-				wheel.GetPosition().x = portalsystem.redportal.x;
-				wheel.GetPosition().y = portalsystem.redportal.y;
+				var xpor = portalsystem.redportal.x/scale;
+				var ypor = portalsystem.redportal.y/scale;
+				var por=new b2Vec2(xpor,ypor);
+				wheel.SetPosition(por);
 				current = 1;
 			}
-			else if (Math.sqrt(Math.pow(wheel.GetPosition().x - portalsystem.redportal.x, 2) + Math.pow(wheel.GetPosition().y - portalsystem.redportal.y, 2)) <= 15 * xlimit / 1200 && current == 0)
+			else if (Math.sqrt(Math.pow(wheel.GetPosition().x*scale - portalsystem.redportal.x, 2) + Math.pow(wheel.GetPosition().y*scale - portalsystem.redportal.y, 2)) <= scale*xlimit / 1200 && current == 0)
 			{
-				wheel.GetPosition().x = portalsystem.blueportal.x;
-				wheel.GetPosition().y = portalsystem.blueportal.y;
+				var xpor = portalsystem.blueportal.x/scale;
+				var ypor = portalsystem.blueportal.y/scale;
+				var por=new b2Vec2(xpor,ypor);
+				wheel.SetPosition(por);	
 				current = 1;
 			}
-			else if (wheel.GetPosition().x != portalsystem.blueportal.x && wheel.GetPosition().y != portalsystem.blueportal.y && wheel.GetPosition().x != portalsystem.redportal.x && wheel.GetPosition().y != portalsystem.redportal.y) current = 0;
+			else if (wheel.GetPosition().x*scale != portalsystem.blueportal.x && wheel.GetPosition().y*scale!= portalsystem.blueportal.y && wheel.GetPosition().x*scale != portalsystem.redportal.x && wheel.GetPosition().y*scale!= portalsystem.redportal.y) 
+				current = 0;
 		}
-		var portalsystem = {
+		
+		var portalsystem = 
+		{
 			radius: 25,
-			blueportal:
-			{},
-			redportal:
-			{},
+			blueportal:{},
+			redportal:{},
 			draw: function ()
 			{
 				ctx.fillStyle = this.redportal.color;
@@ -160,7 +167,6 @@
 		{
 			var k = 360 / 5;
 			var t = k / 60;
-			var DEGTORAD = Math.PI / 180;
 			currentRayAngle += t * DEGTORAD;
 			p2.x = p1.x + rayLength * Math.sin(currentRayAngle);
 			p2.y = p1.y + rayLength * Math.cos(currentRayAngle);
@@ -168,6 +174,7 @@
 			input.p2 = p2;
 			input.maxFraction = 1;
 			closestFraction = 1;
+			//var tempbody= new b2BodyDef(); 
 			var b = new b2BodyDef();
 			var f = new b2FixtureDef();
 			for (b = world.GetBodyList(); b; b = b.GetNext())
@@ -178,6 +185,7 @@
 						continue;
 					else if (output.fraction < closestFraction)
 					{
+						//tempbody=b;
 						closestFraction = output.fraction;
 						intersectionNormal = output.normal;
 					}
@@ -197,16 +205,19 @@
 			ctx.closePath();
 			ctx.stroke();
 			ctx.lineWidth = 1;
-			if (portalsystem.redportal.exist == 0)
+			/*if(count!=0)
 			{
-				portalsystem.redportal.x = intersectionPoint.x * 30;
-				portalsystem.redportal.y = intersectionPoint.y * 30;
-			}
-			if (portalsystem.blueportal.exist == 0)
-			{
-				portalsystem.blueportal.x = wheel.GetPosition().x;
-				portalsystem.blueportal.y = wheel.GetPosition().y;
-			}
+				if (portalsystem.redportal.exist == 0)
+				{
+					portalsystem.redportal.x = intersectionPoint.x *scale;
+					portalsystem.redportal.y = intersectionPoint.y *scale;
+				}
+				if (portalsystem.blueportal.exist == 0)
+				{
+					portalsystem.blueportal.x = wheel.GetPosition().x*scale;
+					portalsystem.blueportal.y = wheel.GetPosition().y*scale;
+				}
+			}*/
 		}
 
 		function downkeyhandler(event)
@@ -235,22 +246,29 @@
 				var mass = wheel.GetMass() * 10;
 				wheel.ApplyImpulse(new b2Vec2(0, mass), wheel.GetPosition());
 				break;
+			case 79:circle=1;
+					break;
 			case 80:
 				scope = 1;
-			case 82:
-				if (portalsystem.redportal.exist == 0)
-				{
-					portalsystem.redportal.exist = 1;
-					portalsystem.draw();
-				}
 				break;
 			case 66:
-				if (portalsystem.blueportal.exist == 0)
+				if (portalsystem.blueportal.exist == 0 && scope==1)
 				{
 					portalsystem.blueportal.exist = 1;
 					portalsystem.draw();
 				}
 				break;
+			case 82:
+				if (portalsystem.redportal.exist == 0 && scope==1)
+				{
+					portalsystem.redportal.exist = 1;
+					portalsystem.draw();
+				}
+				break;
+			case 88:DEGTORAD=-Math.PI / 180;
+					break;
+			case 90:DEGTORAD=Math.PI / 180;
+					break;
 			default:
 				break;
 			}
@@ -265,14 +283,16 @@
 			case 32:if(attached==1||attached==2||attached==3)wheel.SetLinearVelocity(move1);
 					else if(attached==4||attached==5||attached==6)wheel.SetLinearVelocity(move2);
 					else if(attached==7||attached==8||attached==9)wheel.SetLinearVelocity(move3);
-					console.log(wheel.GetPosition());
 					toattach = 0;
 					attached = 0;
 					levattach = 0;
 					levattached = 0;
+					if(count==0)count=1;
 					break;
-			
+			case 79:circle = 0;
+			        break;
 			case 80:scope = 0;
+					break;
 			
 			default:
 				break;
@@ -479,14 +499,6 @@
 								var set = new b2Vec2(b.GetPosition().x, b.GetPosition().y+2*ylimit/900);
 								wheel.SetPosition(set);
 								attached = 1;
-								//wheel.ApplyForce(attract,wheel.GetPosition());
-								/*if(attached==0)
-								{
-								var speedx = (1 * xlimit / 1200);
-								var speedy = 0;
-								var speed = new b2Vec2(speedx, speedy);
-								wheel.ApplyForce(speed,wheel.GetPosition());
-								}*/
 							}
 						}
 					if (b == c1b2)
@@ -497,14 +509,6 @@
 								var set = new b2Vec2(b.GetPosition().x, b.GetPosition().y+2*ylimit/900);
 								wheel.SetPosition(set);
 								attached = 2;
-								//wheel.ApplyForce(attract,wheel.GetPosition());
-								/*if(attached==0)
-								{
-								var speedx = (1 * xlimit / 1200);
-								var speedy = 0;
-								var speed = new b2Vec2(speedx, speedy);
-								wheel.SetLinearVelocity(move1);
-								}*/
 							}
 						}
 				
@@ -516,14 +520,6 @@
 								var set = new b2Vec2(b.GetPosition().x, b.GetPosition().y+2*ylimit/900);
 								wheel.SetPosition(set);
 								attached = 3;
-								//wheel.ApplyForce(attract,wheel.GetPosition());
-								/*if(attached==0)
-								{
-								var speedx = (1 * xlimit / 1200);
-								var speedy = 0;
-								var speed = new b2Vec2(speedx, speedy);
-								wheel.SetLinearVelocity(speed);
-								}*/
 							}
 						}
 					if (b == c2b1)
@@ -596,10 +592,17 @@
 				world.DrawDebugData();
 				world.ClearForces();
 				conveyor_motion();
+				if(circle==1)
+				{
+					ctx.fillStyle = "rgba(255,255,255,0.1)";
+					ctx.beginPath();
+					ctx.arc(wheel.GetPosition().x*scale,wheel.GetPosition().y*scale,15*scale, 0, Math.PI * 2, false);
+					ctx.closePath();
+					ctx.fill();
+				}
 				if (toattach == 1)
 				{
 					attach();
-					//wheel.ApplyForce(new b2Vec2(0 * wheel.GetMass(), -10 * wheel.GetMass()), wheel.GetPosition());
 				}
 				portals();
 				if (portalsystem.redportal.exist == 1 || portalsystem.blueportal.exist == 1)
@@ -607,7 +610,10 @@
 				if (portalsystem.redportal.exist == 1 && portalsystem.blueportal.exist == 1)
 					portalsystem.draw();
 				if (scope == 1)
+				{
 					ray();
+				}
+
 				ctx.fillStyle = 'cyan';
 				ctx.beginPath();
 				ctx.arc(winx, winy, 50, 0, Math.PI * 2, false);
@@ -760,10 +766,10 @@
 	    }
 		window.onload = function ()
 		{
-			portalsystem.redportal.x = 10 * scale;
-			portalsystem.redportal.y = 10 * scale;
-			portalsystem.blueportal.x = 20 * scale;
-			portalsystem.blueportal.y = 20 * scale;
+			/*portalsystem.redportal.x = 10*30*xlimit/1200;
+			portalsystem.redportal.y = 10*30*ylimit/900;
+			portalsystem.blueportal.x = 20 * 30*xlimit/1200;
+			portalsystem.blueportal.y = 20 * 30*ylimit/900;*/
 			portalsystem.redportal.exist = 0;
 			portalsystem.blueportal.exist = 0;
 			portalsystem.redportal.color = 'Crimson';
