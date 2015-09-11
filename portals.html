@@ -345,8 +345,13 @@
 			var fd = new b2FixtureDef;
 			fd.shape = new b2PolygonShape;
 			fd.shape.SetAsBox(5 * xlimit / 1200, 1 * ylimit / 900);
+			var fd1 = new b2FixtureDef;
+			fd1.shape = new b2PolygonShape;
+			fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, -1.1*ylimit/900), 0);
+			fd1.isSensor=true;
 			var ground1 = world.CreateBody(bodyDef);
 			ground1.CreateFixture(fd);
+			ground1.CreateFixture(fd1);
 			
 			// Ground 2
 			var bodyDef = new b2BodyDef;
@@ -355,8 +360,13 @@
 			var fd = new b2FixtureDef;
 			fd.shape = new b2PolygonShape;
 			fd.shape.SetAsBox(5 * xlimit / 1200, 1 * ylimit / 900);
+			var fd1 = new b2FixtureDef;
+			fd1.shape = new b2PolygonShape;
+			fd1.isSensor=true;
+			fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, -1.1*ylimit/900), 0);
 			var ground2 = world.CreateBody(bodyDef);
 			ground2.CreateFixture(fd);
+			ground2.CreateFixture(fd1);
 			
 			// First floor
 			var bodyDef = new b2BodyDef;
@@ -367,38 +377,59 @@
 			floor.shape.SetAsOrientedBox(18 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
 			var firstfloor = world.CreateBody(bodyDef);
 			firstfloor.CreateFixture(floor);
+			
+			//c1b1
 			var bodyDef = new b2BodyDef;
 			bodyDef.type = b2Body.b2_staticBody;
 			bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
 			var box1 = new b2FixtureDef;
 			box1.shape = new b2PolygonShape();
 			box1.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
+			var fd1 = new b2FixtureDef;
+			fd1.shape = new b2PolygonShape;
+			fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 1.1*ylimit/900), 0);
+			fd1.isSensor=true;
 			var c1b1 = world.CreateBody(bodyDef);
 			c1b1.CreateFixture(box1);
+			c1b1.CreateFixture(fd1);
+			
+			//c1b2
 			var bodyDef = new b2BodyDef;
 			bodyDef.type = b2Body.b2_staticBody;
 			bodyDef.position.Set(15 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
 			var box2 = new b2FixtureDef;
 			box2.shape = new b2PolygonShape();
 			box2.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
+			var fd1 = new b2FixtureDef;
+			fd1.shape = new b2PolygonShape;
+			fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 1.1*ylimit/900), 0);
+			fd1.isSensor=true;
 			var c1b2 = world.CreateBody(bodyDef);
 			c1b2.CreateFixture(box2);
+			c1b2.CreateFixture(fd1);
+			
+			//c1b3
 			var bodyDef = new b2BodyDef;
 			bodyDef.type = b2Body.b2_staticBody;
 			bodyDef.position.Set(27 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
 			var box3 = new b2FixtureDef;
 			box3.shape = new b2PolygonShape();
 			box3.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
+			var fd1 = new b2FixtureDef;
+			fd1.shape = new b2PolygonShape;
+			fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 1.1*ylimit/900), 0);
+			fd1.isSensor=true;
 			var c1b3 = world.CreateBody(bodyDef);
 			c1b3.CreateFixture(box3);
+			c1b3.CreateFixture(fd1);
+			
+			//lift
 			var bodyDef = new b2BodyDef;
 			bodyDef.type = b2Body.b2_staticBody;
 			bodyDef.position.Set((xlimit / scale) - (0.5 * xlimit / 1200), (ylimit / scale) - (12 * ylimit / 900));
 			var f = new b2FixtureDef;
 			f.shape = new b2PolygonShape();
 			f.shape.SetAsOrientedBox(0.5 * xlimit / 1200, 12 * ylimit / 900, new b2Vec2(0, 0), 0);
-			
-			//lift
 			var lift = world.CreateBody(bodyDef);
 			lift.CreateFixture(f);
 			var bodyDef = new b2BodyDef;
@@ -558,7 +589,7 @@
 						{
 							if (Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 4 * xlimit / 1200)
 							{
-								var set = new b2Vec2(b.GetPosition().x-1.5*xlimit/1200, b.GetPosition().y);
+								var set = new b2Vec2(b.GetPosition().x-1.4*xlimit/1200, b.GetPosition().y);
 								wheel.SetPosition(set);
 								wheel.ApplyForce(attract,wheel.GetPosition());
 								wheel.SetLinearVelocity(zero,wheel.GetPosition());
@@ -570,7 +601,7 @@
 						{
 							if (Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 4 * xlimit / 1200)
 							{
-								var set = new b2Vec2(b.GetPosition().x-1.5*xlimit/1200, b.GetPosition().y);
+								var set = new b2Vec2(b.GetPosition().x-1.4*xlimit/1200, b.GetPosition().y);
 								wheel.SetPosition(set);
 								wheel.ApplyForce(attract,wheel.GetPosition());
 								wheel.SetLinearVelocity(zero,wheel.GetPosition());
@@ -582,7 +613,7 @@
 						{
 							if (Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 4 * xlimit / 1200)
 							{
-								var set = new b2Vec2(b.GetPosition().x-1.5*xlimit/1200, b.GetPosition().y);
+								var set = new b2Vec2(b.GetPosition().x-1.4*xlimit/1200, b.GetPosition().y);
 								wheel.SetPosition(set);
 								wheel.ApplyForce(attract,wheel.GetPosition());
 								wheel.SetLinearVelocity(zero,wheel.GetPosition());
@@ -658,7 +689,7 @@
 				}
 				ctx.fillStyle = 'cyan';
 				ctx.beginPath();
-				ctx.arc(winx, winy, 15*xlimit/1200, 0, Math.PI * 2, false);
+				ctx.arc(winx, winy, 15*(xlimit+ylimit)/(1200+900), 0, Math.PI * 2, false);
 				ctx.closePath();
 				ctx.fill();
 				if (Math.sqrt(Math.pow(wheel.GetPosition().x * scale - winx, 2) + Math.pow(wheel.GetPosition().y * scale - winy, 2)) > 50)
