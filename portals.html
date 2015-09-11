@@ -5,9 +5,11 @@
 		<meta charset="utf-8" />
 		<title>Portal</title>
 		<script type="text/javascript" src="Box2D.js"></script>
+		<script type="text/javascript" src="jquery-1.7.1.min.js"></script>
 		<style>
 			html,
-			body {
+			body 
+			{
 				font-size:18px;
 				width: 100%;
 				height: 100%;
@@ -16,12 +18,23 @@
 				overflow: hidden;
 				display: block;
 			}
+			
+		   #cc	
+		   {
+			top: 400px;
+			width: 600px;
+			height: 100px;
+			margin: 0;
+			overflow: auto;
+		   }
+   
 		</style>
 	</head>
 
-	<body onresize="resize_canvas()" onkeydown="downkeyhandler(event)" onkeyup="upkeyhandler(event)">
+	<body onresize="resize_canvas()" onkeydown="downkeyhandler(event)" onkeyup="upkeyhandler(event)" onmousemove="getPos(event)" onmouseout="stopTracking()">
 		<!-- An fps counter -->
 		<div id="fps"></div>
+		<!--<div id="displayArea"></div>-->
 		<canvas id="canvas" style="background-color:rgba(0, 0, 0, 0.5)"></canvas>
 	</body>
 	<script>
@@ -85,6 +98,9 @@
 		var DEGTORAD = Math.PI / 180;
 		var count=0;
 		var circle=0;
+		var x;
+		var y;
+
 		
 		//portal variable
 		var current = 0;
@@ -127,6 +143,15 @@
 		var f1 = new b2Vec2(6*wheel.GetMass(),0);
 		var f2 = new b2Vec2(0,-12*wheel.GetMass());
 		var f3 = new b2Vec2(-12*wheel.GetMass(),0);
+		
+		var bodyDef = new b2BodyDef;
+		bodyDef.type = b2Body.b2_staticBody;
+		bodyDef.position.Set(0, 0);
+		var fd = new b2FixtureDef;
+		fd.shape = new b2PolygonShape;
+		fd.shape.SetAsBox(5/scale * xlimit / 1200, 1/scale * ylimit / 900);
+		var detector = world.CreateBody(bodyDef);
+		detector.CreateFixture(fd);
 		
 		//fps display
 		var fps = 
@@ -192,13 +217,33 @@
 				ctx.fill();
 			}
 		};
+		
+		function getPos(e)
+		{
+			x=e.clientX;
+			y=e.clientY;
+			cursor="Your Mouse Position Is : " + x + " and " + y ;
+			//document.getElementById("displayArea").innerHTML=cursor;
+		}
+
+		function stopTracking()
+		{
+        //document.getElementById("displayArea").innerHTML="";
+		}
+		
 		function ray()
 		{
 			var k = 360 / 5;
 			var t = k / 60;
-			currentRayAngle += t * DEGTORAD;
-			p2.x = p1.x + rayLength * Math.sin(currentRayAngle);
-			p2.y = p1.y + rayLength * Math.cos(currentRayAngle);
+			//currentRayAngle += t * DEGTORAD;
+			//p2.x = p1.x + rayLength * Math.sin(currentRayAngle);
+			//p2.y = p1.y + rayLength * Math.cos(currentRayAngle);
+			p2.x=x/scale;
+			p2.y=y/scale;
+			console.log(p2.x);
+			console.log(x);
+			console.log(p2.y);
+			console.log(y);
 			input.p1 = p1;
 			input.p2 = p2;
 			input.maxFraction = 1;
@@ -224,16 +269,21 @@
 			intersectionPoint.y = p1.y + closestFraction * (p2.y - p1.y);
 			normalEnd.x = intersectionPoint.x + intersectionNormal.x;
 			normalEnd.y = intersectionPoint.y + intersectionNormal.y;
-			ctx.strokeStyle = "rgba(255, 255, 255, 1)";
-			ctx.lineWidth = 25;
+			ctx.strokeStyle = "red"; //"rgba(255, 255, 255, 1)";
+			ctx.lineWidth = 5;
 			ctx.bordercolor = 'red';
 			ctx.borderwidth = 10;
 			ctx.beginPath();
-			ctx.moveTo(p1.x * 30, p1.y * 30);
-			ctx.lineTo(intersectionPoint.x * 30, intersectionPoint.y * 30);
+			ctx.moveTo(p1.x * scale, p1.y * scale);
+			ctx.lineTo(intersectionPoint.x * scale, intersectionPoint.y * scale);
 			ctx.closePath();
 			ctx.stroke();
 			ctx.lineWidth = 1;
+			
+			//var rayangle=Math.tan(Math.abs(wheel.GetPosition().y-intersectionPoint.y)/Math.abs(wheel.GetPosition().x-intersectionPoint.x));
+			
+			//detector.SetPositionAndAngle(new b2Vec2(intersectionPoint.x,intersectionPoint.y),rayangle);
+			
 			/*if(count!=0)
 			{
 				if (portalsystem.redportal.exist == 0)
@@ -248,6 +298,7 @@
 				}
 			}*/
 		}
+		
 		function downkeyhandler(event)
 		{
 			var keycode = event.which;
@@ -277,7 +328,10 @@
 			case 79:circle=1;
 					break;
 			case 80:
+				if(scope==0)
 				scope = 1;
+				else if(scope==1)
+				scope = 0;
 				break;
 			case 66:
 				if (portalsystem.blueportal.exist == 0 && scope==1)
@@ -318,13 +372,34 @@
 					break;
 			case 79:circle = 0;
 			        break;
-			case 80:scope = 0;
-					break;
+			//case 80:scope = 0;
+					//break;
 			
 			default:
 				break;
 			}
 		}
+		
+		var listener = new Box2D.Dynamics.b2ContactListener;
+		listener.BeginContact = function(contact)// will be fired when contact begins
+		{ 
+		fxA=contact.GetFixtureA(); // 1st FIXTURE which COLLIDES
+		fxB=contact.GetFixtureB(); // 2nd FIXTURE which COLLIDES
+		sA=fxA.IsSensor(); // Will store whether 1st fixture is a sensor or not (true or false)
+		sB=fxB.IsSensor(); // Will store whether 2nd fixture is a sensor or not (true or false)
+		if((sA && !sB) || (sB && !sA))  // Will go on further iff Fixture A or B not both are sensors.
+			{ 
+				if(sA)  // If Fixture A is a Sensor
+				{ 
+					$('#cc').prepend(contact.GetFixtureB().GetBody().GetUserData() + ' is in the viscinity of body '+contact.GetFixtureA().GetBody().GetUserData()+'<br>'); // Output
+				}
+				else    // If Fixture B is a Sensor
+				{ 
+					$('#cc').prepend(contact.GetFixtureA().GetBody().GetUserData() + ' is in the viscinity of body '+contact.GetFixtureB().GetBody().GetUserData()+'<br>'); // Output
+				}
+			}
+		}
+		
 		var debugDraw = new b2DebugDraw();
 		debugDraw.SetSprite(document.getElementById("canvas").getContext("2d"));
 		debugDraw.SetDrawScale(30); //define scale
@@ -335,6 +410,7 @@
 		world.SetDebugDraw(debugDraw);
 		var winx = 7*scale*xlimit/1200;
 		var winy = ylimit - (19 *scale* ylimit / 900);
+		
 		function level1()
 		{
 			console.log("Inside level1");
@@ -500,6 +576,7 @@
 			bx3.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
 			var c3b3 = world.CreateBody(bodyDef);
 			c3b3.CreateFixture(bx3);
+			
 			function conveyor_motion()
 			{
 				var b = new b2BodyDef();
@@ -658,7 +735,9 @@
 						}
 				}
 			}
+			
 			update1();
+			
 			function update1()
 			{
 				if (toattach == 1)
@@ -668,6 +747,7 @@
 				world.Step(1 / 60, 10, 10);
 				world.DrawDebugData();
 				world.ClearForces();
+				world.SetContactListener(listener);
 				fpsa.innerHTML=fps.getFPS();
 				conveyor_motion();
 				if(circle==1)
