@@ -28,9 +28,9 @@
     </style>
 </head>
 
-<body onresize="resize_canvas()" onkeydown="downkeyhandler(event)" onkeyup="upkeyhandler(event)" onmousemove="getPos(event)" onmouseout="stopTracking()">
-    <!-- An fps counter -->
-    <div id="fps"></div>
+<body onresize="resize_canvas()" onkeydown="downkeyhandler(event)" onkeyup="upkeyhandler(event)" onmousemove="getPos(event)" onmouseout="stopTracking()" onmousedown="mousedown(event)">
+    <!-- An fps counter 
+    <div id="fps"></div>-->
     <!--<div id="displayArea"></div>-->
     <canvas id="canvas" style="background-color:rgba(0, 0, 0, 0.5)"></canvas>
 </body>
@@ -86,7 +86,6 @@
     var b = new b2BodyDef();
     var f = new b2FixtureDef();
     var closestFraction = 1;
-    var intersectionNormal = new b2Vec2(0, 0);
     var intersectionPoint = new b2Vec2();
     var p2 = new b2Vec2();
     var normalEnd = new b2Vec2();
@@ -96,10 +95,35 @@
     var circle = 0;
     var x;
     var y;
-
+	var tempbody = new b2BodyDef();
+	tempbody.type = b2Body.b2_staticBody;
+    tempbody.position.Set(0,0);
+    tempbody.userData = 'null';
+	var tempfix = new b2FixtureDef();
+	tempfix.density = 10;
+    tempfix.friction = 0.5;
+    tempfix.restitution = 0.6;
+    tempfix.shape = new b2CircleShape(1 * (xlimit + ylimit) / (1200 + 900));
+	var temp = world.CreateBody(tempbody);
+    temp.CreateFixture(tempfix);
+	
+	var tempbody = new b2BodyDef();
+	tempbody.type = b2Body.b2_staticBody;
+    tempbody.position.Set(0,0);
+    tempbody.userData = 'null';
+	var tempfix = new b2FixtureDef();
+	tempfix.density = 10;
+    tempfix.friction = 0.5;
+    tempfix.restitution = 0.6;
+    tempfix.shape = new b2CircleShape(1 * (xlimit + ylimit) / (1200 + 900));
+	var temp2 = world.CreateBody(tempbody);
+    temp2.CreateFixture(tempfix);
 
     //portal variable
-    var current = 0;
+    var pcreate = 0;
+	var P1X=0;
+	var P1Y=0;
+	var P1A=0;
 
     //conveyor and attach variables
     var attached = 0;
@@ -171,7 +195,7 @@
     var fpsa = document.getElementById('fps');
 
     //GLOBAL: portals function to exchange position
-    function portals()
+    function portals(num)
     {
         if (Math.sqrt(Math.pow(wheel.GetPosition().x * scale - portalsystem.blueportal.x, 2) + Math.pow(wheel.GetPosition().y * scale - portalsystem.blueportal.y, 2)) <= scale * xlimit / 1200 && current == 0)
         {
@@ -193,26 +217,47 @@
             current = 0;
     }
 
-    var portalsystem = {
-        radius: 25,
-        blueportal:
-        {},
-        redportal:
-        {},
+	var redportal = 
+	{
+	//var id:1,
         draw: function()
         {
-            ctx.fillStyle = this.redportal.color;
-            ctx.beginPath();
-            ctx.arc(this.redportal.x, this.redportal.y, this.radius, 0, Math.PI * 2, false);
-            ctx.closePath();
-            ctx.fill();
-            ctx.fillStyle = this.blueportal.color;
-            ctx.beginPath();
-            ctx.arc(this.blueportal.x, this.blueportal.y, this.radius, 0, Math.PI * 2, false);
-            ctx.closePath();
-            ctx.fill();
+			ctx.rotate(temp.GetAngle());
+            ctx.fillStyle = this.color;
+			ctx.fillRect(temp.GetPosition().x*scale*xlimit/1200,temp.GetPosition().y*scale*ylimit/900, 2*scale*xlimit/1200,0.3*scale*ylimit/900 );
+			ctx.rotate(0);
+			
         }
     };
+	
+    var blueportal = 
+	{
+	//var id:2,
+        draw: function()
+        {
+			ctx.rotate(temp2.GetAngle());
+            ctx.fillStyle = blueportal.color;
+			ctx.fillRect(temp2.GetPosition().x*scale*xlimit/1200,temp2.GetPosition().y*scale*ylimit/900, 2*scale*xlimit/1200,0.3*scale*ylimit/900 );
+			ctx.rotate(0);
+        }
+    };
+	
+	function mousedown(event) 
+	{
+		switch (event.which) 
+		{
+			case 1:if(scope==1)
+					{		
+					if(pcreate==0)pcreate=1;
+				    else if(pcreate==1||pcreate==10)pcreate=2;
+				    else if(pcreate==2||pcreate==20)pcreate=1;
+					}
+					break;
+			case 2:break;
+			case 3:break;
+			default:break;
+		}
+	}
 
     function getPos(e)
     {
@@ -237,16 +282,15 @@
         //p2.y = p1.y + rayLength * Math.cos(currentRayAngle);
         p2.x = x / scale;
         p2.y = y / scale;
-        console.log(p2.x);
+        /*console.log(p2.x);
         console.log(x);
         console.log(p2.y);
-        console.log(y);
+        console.log(y);*/
         input.p1 = p1;
         input.p2 = p2;
         input.maxFraction = 1;
         closestFraction = 1;
-        var tempbody = new b2BodyDef();
-        var tempfix = new b2FixtureDef();
+		var intersectionNormal = new b2Vec2(0, 0);
         var b = new b2BodyDef();
         var f = new b2FixtureDef();
         for (b = world.GetBodyList(); b; b = b.GetNext())
@@ -259,16 +303,46 @@
                 {
                     closestFraction = output.fraction;
                     intersectionNormal = output.normal;
-                    tempbody = b;
-                    tempfix = f;
+					if(pcreate==1)
+					{
+						temp=b;
+						pcreate=10;
+					}
+					if(pcreate==2)
+					{
+						temp2=b;
+						pcreate=20;
+					}
+					//console.log(temp2);
+					//console.log(b);
+                    P1X = b.GetPosition().x
+                    P1Y = b.GetPosition().y
+					P1A = b.GetAngle();
                 }
             }
         }
+		/*if(pcreate==1||pcreate==10||pcreate==20)
+		{
+			redportal.x=temp.GetPosition().x*scale;
+			redportal.y=temp.GetPosition().y*scale;
+			redportal.ori=temp.GetAngle();
+			pcreate=10;
+			flag=1;
+		}
+		if(pcreate==2||pcreate==20||pcreate==10)
+		{
+			blueportal.x=temp2.GetPosition().x*scale;
+			blueportal.y=temp2.GetPosition().y*scale;
+			blueportal.ori=P1A;
+			if(flag!=1)
+			pcreate=20;
+		}*/
+		//console.log(intersectionNormal);
         intersectionPoint.x = p1.x + closestFraction * (p2.x - p1.x);
         intersectionPoint.y = p1.y + closestFraction * (p2.y - p1.y);
         normalEnd.x = intersectionPoint.x + intersectionNormal.x;
         normalEnd.y = intersectionPoint.y + intersectionNormal.y;
-        ctx.strokeStyle = "red"; //"rgba(255, 255, 255, 1)";
+        ctx.strokeStyle = "white"; //"rgba(255, 255, 255, 1)";
         ctx.lineWidth = 5;
         ctx.bordercolor = 'red';
         ctx.borderwidth = 10;
@@ -277,7 +351,7 @@
         ctx.lineTo(intersectionPoint.x * scale, intersectionPoint.y * scale);
         ctx.closePath();
         ctx.stroke();
-
+		ctx.strokeStyle = "red";
         ctx.beginPath(); // Start the path
         ctx.moveTo(intersectionPoint.x * 30, intersectionPoint.y * 30); // Set the path origin
         ctx.lineTo(normalEnd.x * 30, normalEnd.y * 30); // Set the path destination
@@ -402,11 +476,18 @@
             {
                 if (sA) // If Fixture A is a Sensor
                 {
-                    $('#cc').prepend(contact.GetFixtureB().GetBody().GetUserData() + ' is in the viscinity of body ' + contact.GetFixtureA().GetBody().GetUserData() + '<br>'); // Output
+					if(sA.userData=='portal' && sb.userData=='obj')
+					{
+                    portals();
+					}
+					
                 }
                 else // If Fixture B is a Sensor
                 {
-                    $('#cc').prepend(contact.GetFixtureA().GetBody().GetUserData() + ' is in the viscinity of body ' + contact.GetFixtureB().GetBody().GetUserData() + '<br>'); // Output
+                    if(sA.userData=='portal' && sb.userData=='obj')
+					{
+					portals();
+					}
                 }
             }
         }
@@ -436,6 +517,7 @@
         fd1.shape = new b2PolygonShape;
         fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, -1.1 * ylimit / 900), 0);
         fd1.isSensor = true;
+		fd1.userData='portal';
         var ground1 = world.CreateBody(bodyDef);
         ground1.CreateFixture(fd);
         ground1.CreateFixture(fd1);
@@ -450,6 +532,7 @@
         var fd1 = new b2FixtureDef;
         fd1.shape = new b2PolygonShape;
         fd1.isSensor = true;
+		fd1.userData='portal';
         fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, -1.1 * ylimit / 900), 0);
         var ground2 = world.CreateBody(bodyDef);
         ground2.CreateFixture(fd);
@@ -476,6 +559,7 @@
         fd1.shape = new b2PolygonShape;
         fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 1.1 * ylimit / 900), 0);
         fd1.isSensor = true;
+		fd1.userData='portal';
         var c1b1 = world.CreateBody(bodyDef);
         c1b1.CreateFixture(box1);
         c1b1.CreateFixture(fd1);
@@ -491,6 +575,7 @@
         fd1.shape = new b2PolygonShape;
         fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 1.1 * ylimit / 900), 0);
         fd1.isSensor = true;
+		fd1.userData='portal';
         var c1b2 = world.CreateBody(bodyDef);
         c1b2.CreateFixture(box2);
         c1b2.CreateFixture(fd1);
@@ -506,6 +591,7 @@
         fd1.shape = new b2PolygonShape;
         fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 1.1 * ylimit / 900), 0);
         fd1.isSensor = true;
+		fd1.userData='portal';
         var c1b3 = world.CreateBody(bodyDef);
         c1b3.CreateFixture(box3);
         c1b3.CreateFixture(fd1);
@@ -524,7 +610,7 @@
         bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (2 * ylimit / 900));
         var b1 = new b2FixtureDef;
         b1.shape = new b2PolygonShape();
-        b1.shape.SetAsOrientedBox(0.5 * xlimit / 1200, 2 * ylimit / 900, new b2Vec2(0, 0), 0);
+        b1.shape.SetAsOrientedBox(2 * ylimit / 900, 0.5 * xlimit / 1200, new b2Vec2(0, 0), Math.PI/2);
         var c2b1 = world.CreateBody(bodyDef);
         c2b1.CreateFixture(b1);
         var bodyDef = new b2BodyDef;
@@ -532,7 +618,7 @@
         bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (10 * ylimit / 900));
         var b2 = new b2FixtureDef;
         b2.shape = new b2PolygonShape();
-        b2.shape.SetAsOrientedBox(0.5 * xlimit / 1200, 2 * ylimit / 900, new b2Vec2(0, 0), 0);
+        b2.shape.SetAsOrientedBox(2 * ylimit / 900, 0.5 * xlimit / 1200, new b2Vec2(0, 0), Math.PI/2);
         var c2b2 = world.CreateBody(bodyDef);
         c2b2.CreateFixture(b2);
         var bodyDef = new b2BodyDef;
@@ -540,7 +626,7 @@
         bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (18 * ylimit / 900));
         var b3 = new b2FixtureDef;
         b3.shape = new b2PolygonShape();
-        b3.shape.SetAsOrientedBox(0.5 * xlimit / 1200, 2 * ylimit / 900, new b2Vec2(0, 0), 0);
+        b3.shape.SetAsOrientedBox(2 * ylimit / 900,0.5 * xlimit / 1200, new b2Vec2(0, 0), Math.PI/2);
         var c2b3 = world.CreateBody(bodyDef);
         c2b3.CreateFixture(b3);
 
@@ -760,8 +846,13 @@
             world.DrawDebugData();
             world.ClearForces();
             world.SetContactListener(listener);
-            fpsa.innerHTML = fps.getFPS();
+            //fpsa.innerHTML = fps.getFPS();
             conveyor_motion();
+			if(pcreate>0)
+			{
+			redportal.draw();
+			blueportal.draw();
+			}
             if (circle == 1)
             {
                 ctx.fillStyle = "rgba(255,255,255,0.1)";
@@ -770,11 +861,11 @@
                 ctx.closePath();
                 ctx.fill();
             }
-            portals();
-            if (portalsystem.redportal.exist == 1 || portalsystem.blueportal.exist == 1)
+            //portals();
+            /*if (portalsystem.redportal.exist == 1 || portalsystem.blueportal.exist == 1)
                 portalsystem.draw();
             if (portalsystem.redportal.exist == 1 && portalsystem.blueportal.exist == 1)
-                portalsystem.draw();
+                portalsystem.draw();*/
             if (scope == 1)
             {
                 ray();
@@ -909,14 +1000,8 @@
     }
     window.onload = function()
     {
-        /*portalsystem.redportal.x = 10*30*xlimit/1200;
-        portalsystem.redportal.y = 10*30*ylimit/900;
-        portalsystem.blueportal.x = 20 * 30*xlimit/1200;
-        portalsystem.blueportal.y = 20 * 30*ylimit/900;*/
-        portalsystem.redportal.exist = 0;
-        portalsystem.blueportal.exist = 0;
-        portalsystem.redportal.color = 'Crimson';
-        portalsystem.blueportal.color = 'rgba(54, 161, 255, 0.8)';
+		redportal.color='rgba(215, 44, 44, 0.6)';
+		blueportal.color='rgba(54, 161, 255, 0.6)';
         level1();
     }
 </script>
