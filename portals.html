@@ -124,6 +124,9 @@
 	var P1X=0;
 	var P1Y=0;
 	var P1A=0;
+	var current=0;
+	var shouldmove=0;
+	var newpo=new b2Vec2();
 
     //conveyor and attach variables
     var attached = 0;
@@ -195,26 +198,22 @@
     var fpsa = document.getElementById('fps');
 
     //GLOBAL: portals function to exchange position
-    function portals(num)
+    function portals(tempbody)
     {
-        if (Math.sqrt(Math.pow(wheel.GetPosition().x * scale - portalsystem.blueportal.x, 2) + Math.pow(wheel.GetPosition().y * scale - portalsystem.blueportal.y, 2)) <= scale * xlimit / 1200 && current == 0)
-        {
-            var xpor = portalsystem.redportal.x / scale;
-            var ypor = portalsystem.redportal.y / scale;
-            var por = new b2Vec2(xpor, ypor);
-            wheel.SetPosition(por);
-            current = 1;
-        }
-        else if (Math.sqrt(Math.pow(wheel.GetPosition().x * scale - portalsystem.redportal.x, 2) + Math.pow(wheel.GetPosition().y * scale - portalsystem.redportal.y, 2)) <= scale * xlimit / 1200 && current == 0)
-        {
-            var xpor = portalsystem.blueportal.x / scale;
-            var ypor = portalsystem.blueportal.y / scale;
-            var por = new b2Vec2(xpor, ypor);
-            wheel.SetPosition(por);
-            current = 1;
-        }
-        else if (wheel.GetPosition().x * scale != portalsystem.blueportal.x && wheel.GetPosition().y * scale != portalsystem.blueportal.y && wheel.GetPosition().x * scale != portalsystem.redportal.x && wheel.GetPosition().y * scale != portalsystem.redportal.y)
-            current = 0;
+		//console.log(tempbody);
+		if(current==0)
+		{
+		//alert("Inside fnc");
+		console.log(tempbody.GetPosition());
+		newpo.x=tempbody.GetPosition().x;
+		newpo.y=tempbody.GetPosition().y;
+		console.log(newpo);
+		shouldmove=1;
+		console.log(wheel.GetPosition());
+		current=1;
+		}
+        /*else if (wheel.GetPosition().x * scale != blueportal.x && wheel.GetPosition().y * scale != portalsystem.blueportal.y && wheel.GetPosition().x * scale != portalsystem.redportal.x && wheel.GetPosition().y * scale != portalsystem.redportal.y)
+            current = 0;*/
     }
 
 	var redportal = 
@@ -272,6 +271,92 @@
         //document.getElementById("displayArea").innerHTML="";
     }
 
+	var listener = new Box2D.Dynamics.b2ContactListener;
+    listener.BeginContact = function(contact) // will be fired when contact begins
+        {
+            fxA = contact.GetFixtureA(); // 1st FIXTURE which COLLIDES
+            fxB = contact.GetFixtureB(); // 2nd FIXTURE which COLLIDES
+			fbA = fxA.GetBody();
+			fbB = fxB.GetBody();
+			AUD=fbA.GetUserData();
+			BUD=fbB.GetUserData();
+            sA = fxA.IsSensor(); // Will store whether 1st fixture is a sensor or not (true or false)
+            sB = fxB.IsSensor(); // Will store whether 2nd fixture is a sensor or not (true or false)
+            if ((sA && !sB) || (sB && !sA)) // Will go on further iff Fixture A or B not both are sensors.
+            {
+                if (sA) // If Fixture A is a Sensor
+                {
+					alert("here187687");
+					if(AUD=='portal' && BUD=='obj' && fbA==temp)
+					{
+					alert("here1");
+                    portals(temp2);
+					}
+					else if(AUD=='portal' && BUD=='obj' && fbA==temp2)
+					{
+					alert("here2");
+                    portals(temp);
+					}
+					
+                }
+                else // If Fixture B is a Sensor
+                {
+                    if(BUD=='portal' && AUD=='obj' && fbB==temp)
+					{
+					alert("here3");
+					portals(temp2);
+					}
+					else if(BUD=='portal' && AUD=='obj' && fbB==temp2)
+					{
+					alert("here4");
+					portals(temp);
+					}
+                }
+            }
+        }
+	listener.EndContact = function(contact) 
+	{
+         	 fxA=contact.GetFixtureA();
+			 fxB=contact.GetFixtureB();
+			 fbA = fxA.GetBody();
+			 fbB = fxB.GetBody();
+			 AUD=fbA.GetUserData();
+			 BUD=fbB.GetUserData();
+			 sA=fxA.IsSensor();
+			 sB=fxB.IsSensor();
+			 if((sA && !sB) || (sB && !sA))	{
+				 if(sA)	
+				 {
+					alert("Here00011245");
+					if(AUD=='portal' && BUD=='obj' && fbA==temp)
+					{
+						alert("Here0001");
+						current=0;
+					}
+					else if(AUD=='portal' && BUD=='obj' && fbA==temp2)
+					{
+						alert("Here0002");
+						current=0;
+					}
+					
+				 }
+				 else	
+				 {
+					alert("Here000223557");
+					if(BUD=='portal' && AUD=='obj' && fbB==temp)
+					{
+						alert("Here0003");
+						current=0;
+					}
+					else if(BUD=='portal' && AUD=='obj' && fbB==temp2)
+					{
+						alert("Here0004");
+						current=0;
+					}
+				 }
+			 }
+		 }
+	
     function ray()
     {
         detector.SetPosition(zero);
@@ -313,36 +398,14 @@
 						temp2=b;
 						pcreate=20;
 					}
-					//console.log(temp2);
-					//console.log(b);
-                    P1X = b.GetPosition().x
-                    P1Y = b.GetPosition().y
-					P1A = b.GetAngle();
                 }
             }
         }
-		/*if(pcreate==1||pcreate==10||pcreate==20)
-		{
-			redportal.x=temp.GetPosition().x*scale;
-			redportal.y=temp.GetPosition().y*scale;
-			redportal.ori=temp.GetAngle();
-			pcreate=10;
-			flag=1;
-		}
-		if(pcreate==2||pcreate==20||pcreate==10)
-		{
-			blueportal.x=temp2.GetPosition().x*scale;
-			blueportal.y=temp2.GetPosition().y*scale;
-			blueportal.ori=P1A;
-			if(flag!=1)
-			pcreate=20;
-		}*/
-		//console.log(intersectionNormal);
         intersectionPoint.x = p1.x + closestFraction * (p2.x - p1.x);
         intersectionPoint.y = p1.y + closestFraction * (p2.y - p1.y);
         normalEnd.x = intersectionPoint.x + intersectionNormal.x;
         normalEnd.y = intersectionPoint.y + intersectionNormal.y;
-        ctx.strokeStyle = "white"; //"rgba(255, 255, 255, 1)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
         ctx.lineWidth = 5;
         ctx.bordercolor = 'red';
         ctx.borderwidth = 10;
@@ -351,12 +414,12 @@
         ctx.lineTo(intersectionPoint.x * scale, intersectionPoint.y * scale);
         ctx.closePath();
         ctx.stroke();
-		ctx.strokeStyle = "red";
+		/*ctx.strokeStyle = "red";
         ctx.beginPath(); // Start the path
         ctx.moveTo(intersectionPoint.x * 30, intersectionPoint.y * 30); // Set the path origin
         ctx.lineTo(normalEnd.x * 30, normalEnd.y * 30); // Set the path destination
         ctx.closePath(); // Close the path
-        ctx.stroke();
+        ctx.stroke();*/
         ctx.lineWidth = 1;
 
         var rayangle = Math.tan(Math.abs(wheel.GetPosition().y - intersectionPoint.y) / Math.abs(wheel.GetPosition().x - intersectionPoint.x));
@@ -465,37 +528,10 @@
         }
     }
 
-    var listener = new Box2D.Dynamics.b2ContactListener;
-    listener.BeginContact = function(contact) // will be fired when contact begins
-        {
-            fxA = contact.GetFixtureA(); // 1st FIXTURE which COLLIDES
-            fxB = contact.GetFixtureB(); // 2nd FIXTURE which COLLIDES
-            sA = fxA.IsSensor(); // Will store whether 1st fixture is a sensor or not (true or false)
-            sB = fxB.IsSensor(); // Will store whether 2nd fixture is a sensor or not (true or false)
-            if ((sA && !sB) || (sB && !sA)) // Will go on further iff Fixture A or B not both are sensors.
-            {
-                if (sA) // If Fixture A is a Sensor
-                {
-					if(sA.userData=='portal' && sb.userData=='obj')
-					{
-                    portals();
-					}
-					
-                }
-                else // If Fixture B is a Sensor
-                {
-                    if(sA.userData=='portal' && sb.userData=='obj')
-					{
-					portals();
-					}
-                }
-            }
-        }
-
     var debugDraw = new b2DebugDraw();
     debugDraw.SetSprite(document.getElementById("canvas").getContext("2d"));
     debugDraw.SetDrawScale(30); //define scale
-    debugDraw.SetFillAlpha(1); //define transparency
+    debugDraw.SetFillAlpha(0.1); //define transparency
     debugDraw.SetLineThickness(0.1);
     debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
     //debugDraw.SetFlags(b2DebugDraw.e_shapeBit);
@@ -505,6 +541,7 @@
 
     function level1()
     {
+		
         console.log("Inside level1");
         // Ground 1
         var bodyDef = new b2BodyDef;
@@ -513,14 +550,19 @@
         var fd = new b2FixtureDef;
         fd.shape = new b2PolygonShape;
         fd.shape.SetAsBox(5 * xlimit / 1200, 1 * ylimit / 900);
-        var fd1 = new b2FixtureDef;
-        fd1.shape = new b2PolygonShape;
-        fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, -1.1 * ylimit / 900), 0);
-        fd1.isSensor = true;
-		fd1.userData='portal';
         var ground1 = world.CreateBody(bodyDef);
         ground1.CreateFixture(fd);
-        ground1.CreateFixture(fd1);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(5 * xlimit / 1200, (ylimit / scale) - (2.1 * ylimit / 900));
+		bodyDef.userData='portal';
+        var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        fd1.isSensor = true;
+		var p1 = world.CreateBody(bodyDef);
+        p1.CreateFixture(fd1);
 
         // Ground 2
         var bodyDef = new b2BodyDef;
@@ -529,14 +571,19 @@
         var fd = new b2FixtureDef;
         fd.shape = new b2PolygonShape;
         fd.shape.SetAsBox(5 * xlimit / 1200, 1 * ylimit / 900);
-        var fd1 = new b2FixtureDef;
-        fd1.shape = new b2PolygonShape;
-        fd1.isSensor = true;
-		fd1.userData='portal';
-        fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, -1.1 * ylimit / 900), 0);
         var ground2 = world.CreateBody(bodyDef);
         ground2.CreateFixture(fd);
-        ground2.CreateFixture(fd1);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set((xlimit / scale) - (9 * xlimit / 1200), (ylimit / scale) - (2.1 * ylimit / 900));
+		bodyDef.userData='portal';
+        var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        fd1.isSensor = true;
+		var p2 = world.CreateBody(bodyDef);
+        p2.CreateFixture(fd1);
 
         // First floor
         var bodyDef = new b2BodyDef;
@@ -848,6 +895,11 @@
             world.SetContactListener(listener);
             //fpsa.innerHTML = fps.getFPS();
             conveyor_motion();
+			if(shouldmove==1)
+			{
+				wheel.SetPosition(newpo);
+				shouldmove=0;
+			}
 			if(pcreate>0)
 			{
 			redportal.draw();
@@ -1000,6 +1052,10 @@
     }
     window.onload = function()
     {
+		redportal.x=0;
+		redportal.y=0;
+		blueportal.x=100;
+		blueportal.y=100;
 		redportal.color='rgba(215, 44, 44, 0.6)';
 		blueportal.color='rgba(54, 161, 255, 0.6)';
         level1();
