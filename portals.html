@@ -103,7 +103,7 @@
 	tempfix.density = 10;
     tempfix.friction = 0.5;
     tempfix.restitution = 0.6;
-    tempfix.shape = new b2CircleShape(1 * (xlimit + ylimit) / (1200 + 900));
+    tempfix.shape = new b2CircleShape(0.001 * (xlimit + ylimit) / (1200 + 900));
 	var temp = world.CreateBody(tempbody);
     temp.CreateFixture(tempfix);
 	
@@ -115,15 +115,12 @@
 	tempfix.density = 10;
     tempfix.friction = 0.5;
     tempfix.restitution = 0.6;
-    tempfix.shape = new b2CircleShape(1 * (xlimit + ylimit) / (1200 + 900));
+    tempfix.shape = new b2CircleShape(0.001 * (xlimit + ylimit) / (1200 + 900));
 	var temp2 = world.CreateBody(tempbody);
     temp2.CreateFixture(tempfix);
 
     //portal variable
     var pcreate = 0;
-	var P1X=0;
-	var P1Y=0;
-	var P1A=0;
 	var current=0;
 	var shouldmove=0;
 	var newpo=new b2Vec2();
@@ -602,14 +599,19 @@
         var box1 = new b2FixtureDef;
         box1.shape = new b2PolygonShape();
         box1.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
-        var fd1 = new b2FixtureDef;
-        fd1.shape = new b2PolygonShape;
-        fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 1.1 * ylimit / 900), 0);
-        fd1.isSensor = true;
-		fd1.userData='portal';
         var c1b1 = world.CreateBody(bodyDef);
         c1b1.CreateFixture(box1);
-        c1b1.CreateFixture(fd1);
+        
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (8.9 * ylimit / 900));
+		bodyDef.userData='portal';
+		var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        fd1.isSensor = true;
+		var p3= world.CreateBody(bodyDef);
+		p3.CreateFixture(fd1);
 
         //c1b2
         var bodyDef = new b2BodyDef;
@@ -618,14 +620,20 @@
         var box2 = new b2FixtureDef;
         box2.shape = new b2PolygonShape();
         box2.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
-        var fd1 = new b2FixtureDef;
-        fd1.shape = new b2PolygonShape;
-        fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 1.1 * ylimit / 900), 0);
-        fd1.isSensor = true;
-		fd1.userData='portal';
         var c1b2 = world.CreateBody(bodyDef);
         c1b2.CreateFixture(box2);
-        c1b2.CreateFixture(fd1);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(15 * xlimit / 1200, (ylimit / scale) - (8.9 * ylimit / 900));
+		bodyDef.userData='portal';
+		var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        fd1.isSensor = true;
+		var p4= world.CreateBody(bodyDef);
+		p4.CreateFixture(fd1);
+		
 
         //c1b3
         var bodyDef = new b2BodyDef;
@@ -634,14 +642,19 @@
         var box3 = new b2FixtureDef;
         box3.shape = new b2PolygonShape();
         box3.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
-        var fd1 = new b2FixtureDef;
-        fd1.shape = new b2PolygonShape;
-        fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 1.1 * ylimit / 900), 0);
-        fd1.isSensor = true;
-		fd1.userData='portal';
         var c1b3 = world.CreateBody(bodyDef);
         c1b3.CreateFixture(box3);
-        c1b3.CreateFixture(fd1);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(27 * xlimit / 1200, (ylimit / scale) - (8.9 * ylimit / 900));
+		bodyDef.userData='portal';
+		var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        fd1.isSensor = true;
+		var p5= world.CreateBody(bodyDef);
+		p5.CreateFixture(fd1);
 
         //lift
         var bodyDef = new b2BodyDef;
@@ -652,14 +665,27 @@
         f.shape.SetAsOrientedBox(0.5 * xlimit / 1200, 12 * ylimit / 900, new b2Vec2(0, 0), 0);
         var lift = world.CreateBody(bodyDef);
         lift.CreateFixture(f);
+		
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (2 * ylimit / 900));
         var b1 = new b2FixtureDef;
         b1.shape = new b2PolygonShape();
-        b1.shape.SetAsOrientedBox(2 * ylimit / 900, 0.5 * xlimit / 1200, new b2Vec2(0, 0), Math.PI/2);
+        b1.shape.SetAsOrientedBox(2 * ylimit / 900, 0.5 * xlimit / 1200, new b2Vec2(0, 0), (Math.PI/2));
         var c2b1 = world.CreateBody(bodyDef);
         c2b1.CreateFixture(b1);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set((xlimit / scale) - (2.1 * xlimit / 1200), (ylimit / scale) - (2 * ylimit / 900));
+		bodyDef.userData='portal';
+		var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(1 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), (Math.PI)/2);
+        fd1.isSensor = true;
+		var p6= world.CreateBody(bodyDef);
+		p6.CreateFixture(fd1);
+		
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (10 * ylimit / 900));
@@ -668,6 +694,18 @@
         b2.shape.SetAsOrientedBox(2 * ylimit / 900, 0.5 * xlimit / 1200, new b2Vec2(0, 0), Math.PI/2);
         var c2b2 = world.CreateBody(bodyDef);
         c2b2.CreateFixture(b2);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set((xlimit / scale) - (2.1 * xlimit / 1200), (ylimit / scale) - (10 * ylimit / 900));
+		bodyDef.userData='portal';
+		var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(1 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), (Math.PI)/2);
+        fd1.isSensor = true;
+		var p7= world.CreateBody(bodyDef);
+		p7.CreateFixture(fd1);
+		
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (18 * ylimit / 900));
@@ -676,6 +714,17 @@
         b3.shape.SetAsOrientedBox(2 * ylimit / 900,0.5 * xlimit / 1200, new b2Vec2(0, 0), Math.PI/2);
         var c2b3 = world.CreateBody(bodyDef);
         c2b3.CreateFixture(b3);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set((xlimit / scale) - (2.1 * xlimit / 1200), (ylimit / scale) - (18 * ylimit / 900));
+		bodyDef.userData='portal';
+		var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(1 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), (Math.PI)/2);
+        fd1.isSensor = true;
+		var p8= world.CreateBody(bodyDef);
+		p8.CreateFixture(fd1);
 
         // intermediate floor
         var bodyDef = new b2BodyDef;
@@ -726,7 +775,7 @@
             var b = new b2BodyDef();
             for (b = world.GetBodyList(); b; b = b.GetNext())
             {
-                if (b == c1b1 || b == c1b2 || b == c1b3)
+                if (b == c1b1 || b == c1b2 || b == c1b3||b==p3||b==p4||b==p5)
                 {
                     //console.log(b.GetPosition());
                     var back1 = new b2Vec2(-3 * xlimit / 1200, b.GetPosition().y);
@@ -738,7 +787,7 @@
                     b.SetPosition(move);
                     //wheel.SetLinearVelocity(move);
                 }
-                if (b == c2b1 || b == c2b2 || b == c2b3)
+                if (b == c2b1 || b == c2b2 || b == c2b3 || b == p6 || b == p7 || b == p8)
                 {
                     //console.log(b.GetPosition());
                     var back2 = new b2Vec2(b.GetPosition().x, 32 * ylimit / 900);
