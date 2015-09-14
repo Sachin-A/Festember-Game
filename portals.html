@@ -136,14 +136,15 @@
 	
 	
     //conveyor and attach variables
-    var attached = 0;
+    /*var attached = 0;
     var toattach = 0;
     var levattach = 0;
     var levattached = 0;
     var move1 = new b2Vec2(7 * xlimit / 1200, 0);
     var move2 = new b2Vec2(0, -8 * ylimit / 900);
-    var move3 = new b2Vec2(-10 * xlimit / 1200, 0);
+    var move3 = new b2Vec2(-10 * xlimit / 1200, 0);*/
     var zero = new b2Vec2(0, 0);
+	var gah;
 
     //Player: Circle
     //body definition
@@ -280,6 +281,7 @@
         //document.getElementById("displayArea").innerHTML="";
     }
 
+	var pull = [];
 	var listener = new Box2D.Dynamics.b2ContactListener;
     listener.BeginContact = function(contact) // will be fired when contact begins
         {
@@ -315,6 +317,10 @@
 					vspeed.x=wheel.GetLinearVelocity().x*2;
 					vspeed.y=wheel.GetLinearVelocity().y*2;
 					}
+					if(AUD=='conveyor' && BUD=='obj')
+					{
+					pull.push(fbA);
+					}
                 }
                 else // If Fixture B is a Sensor
                 {
@@ -335,6 +341,10 @@
 					shouldbounce=1;
 					vx=wheel.GetLinearVelocity().x*2;
 					vy=wheel.GetLinearVelocity().y*2;
+					}
+					if(BUD=='conveyor' && AUD=='obj')
+					{
+					pull.push(fbB);
 					}
                 }
             }
@@ -365,6 +375,11 @@
 						//alert("Here0002");
 						current=0;
 					}
+					if(AUD=='conveyor' && BUD=='obj')
+					{
+					var index = pull.indexOf(fbA); 
+					pull.splice(index,1);
+					}
 					
 				 }
 				 else	
@@ -381,6 +396,11 @@
 						fxA.SetRestitution(0.6);
 						//alert("Here0004");
 						current=0;
+					}
+					if(BUD=='conveyor' && AUD=='obj')
+					{
+					var index = pull.indexOf(fbB); 
+					pull.splice(index,1);
 					}
 				 }
 			 }
@@ -404,9 +424,10 @@
         {
             for (f = b.GetFixtureList(); f; f = f.GetNext())
             {
+				gah = b.GetUserData();
                 if (!f.RayCast(output, input))
                     continue;
-                else if (output.fraction < closestFraction)
+                else if (output.fraction < closestFraction && gah!='conveyor')
                 {
                     closestFraction = output.fraction;
                     intersectionNormal = output.normal;
@@ -438,7 +459,7 @@
         ctx.stroke();
         ctx.lineWidth = 1;
 
-        var rayangle = Math.tan(Math.abs(wheel.GetPosition().y - intersectionPoint.y) / Math.abs(wheel.GetPosition().x - intersectionPoint.x));
+        //var rayangle = Math.tan(Math.abs(wheel.GetPosition().y - intersectionPoint.y) / Math.abs(wheel.GetPosition().x - intersectionPoint.x));
 
         //detector.SetPositionAndAngle(new b2Vec2(intersectionPoint.x,intersectionPoint.y),rayangle);
 
@@ -463,10 +484,9 @@
         //console.log("We're in down");
         switch (keycode)
         {
-            case 32: //console.log("We're in key");
-                toattach = 1;
-                levattach = 1;
-                break;
+            case 32:if (count == 0) count = 1;
+					else if (count == 1) count = 0;
+					break;
             case 37:
                 var mass = wheel.GetMass() * 10;
                 wheel.ApplyImpulse(new b2Vec2(-0.1*mass, 0), wheel.GetPosition());
@@ -522,17 +542,16 @@
         var keycode = event.which;
         switch (keycode)
         {
-
-            case 32:
-                if (attached == 1 || attached == 2 || attached == 3) wheel.ApplyImpulse(f1, wheel.GetPosition());
+			//case 32:if (count == 1) count = 0;
+					//break;
+                /*if (attached == 1 || attached == 2 || attached == 3) wheel.ApplyImpulse(f1, wheel.GetPosition());
                 else if (attached == 4 || attached == 5 || attached == 6) wheel.ApplyImpulse(f2, wheel.GetPosition());
                 else if (attached == 7 || attached == 8 || attached == 9) wheel.ApplyImpulse(f3, wheel.GetPosition());
                 toattach = 0;
                 attached = 0;
                 levattach = 0;
                 levattached = 0;
-                if (count == 0) count = 1;
-                break;
+                if (count == 0) count = 1;*/
             case 79:
                 circle = 0;
                 break;
@@ -558,11 +577,19 @@
     function level1()
     {
 		
-        console.log("Inside level1");
+        for (b = world.GetBodyList(); b; b = b.GetNext())
+        {
+            if (b != wheel)
+                world.DestroyBody(b);
+        }
+		var start2=new b2Vec2(4*xlimit/1200,25*ylimit/900);
+		wheel.SetPosition(start2);
+		console.log("Inside level1");
         // Ground 1
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(5 * xlimit / 1200, (ylimit / scale) - (1 * ylimit / 900));
+		bodyDef.userData='ground';
         var fd = new b2FixtureDef;
         fd.shape = new b2PolygonShape;
         fd.shape.SetAsBox(5 * xlimit / 1200, 1 * ylimit / 900);
@@ -584,6 +611,7 @@
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set((xlimit / scale) - (9 * xlimit / 1200), (ylimit / scale) - (1 * ylimit / 900));
+		bodyDef.userData='ground';
         var fd = new b2FixtureDef;
         fd.shape = new b2PolygonShape;
         fd.shape.SetAsBox(5 * xlimit / 1200, 1 * ylimit / 900);
@@ -605,6 +633,7 @@
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(18 * xlimit / 1200, (ylimit / scale) - (12 * ylimit / 900));
+		bodyDef.userData='carrier';
         var floor = new b2FixtureDef;
         floor.shape = new b2PolygonShape();
         floor.shape.SetAsOrientedBox(18 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
@@ -615,11 +644,24 @@
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+		bodyDef.userData='cbox';
         var box1 = new b2FixtureDef;
         box1.shape = new b2PolygonShape();
         box1.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
-        var c1b1 = world.CreateBody(bodyDef);
+		var c1b1 = world.CreateBody(bodyDef);
         c1b1.CreateFixture(box1);
+			
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+		bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+		bodyDef.userData='conveyor';
+		var fixDef2 = new b2FixtureDef;
+        fixDef2.shape = new b2CircleShape(5);
+        fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
+        fixDef2.density = 0;
+        fixDef2.isSensor = true;
+        var CC1 = world.CreateBody(bodyDef);
+        CC1.CreateFixture(fixDef2);
         
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
@@ -631,16 +673,30 @@
         fd1.isSensor = true;
 		var p3= world.CreateBody(bodyDef);
 		p3.CreateFixture(fd1);
+		
 
         //c1b2
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(15 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+		bodyDef.userData='cbox';
         var box2 = new b2FixtureDef;
         box2.shape = new b2PolygonShape();
         box2.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
         var c1b2 = world.CreateBody(bodyDef);
         c1b2.CreateFixture(box2);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+		bodyDef.position.Set(15 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+		bodyDef.userData='conveyor';
+		var fixDef2 = new b2FixtureDef;
+        fixDef2.shape = new b2CircleShape(5);
+        fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
+        fixDef2.density = 0;
+        fixDef2.isSensor = true;
+        var CC2 = world.CreateBody(bodyDef);
+        CC2.CreateFixture(fixDef2);
 		
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
@@ -658,11 +714,24 @@
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(27 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+		bodyDef.userData='cbox';
         var box3 = new b2FixtureDef;
         box3.shape = new b2PolygonShape();
         box3.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
         var c1b3 = world.CreateBody(bodyDef);
         c1b3.CreateFixture(box3);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+		bodyDef.position.Set(27 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+		bodyDef.userData='conveyor';
+		var fixDef2 = new b2FixtureDef;
+        fixDef2.shape = new b2CircleShape(5);
+        fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
+        fixDef2.density = 0;
+        fixDef2.isSensor = true;
+        var CC3 = world.CreateBody(bodyDef);
+        CC3.CreateFixture(fixDef2);
 		
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
@@ -679,6 +748,7 @@
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set((xlimit / scale) - (0.5 * xlimit / 1200), (ylimit / scale) - (12 * ylimit / 900));
+		bodyDef.userData='carrier';
         var f = new b2FixtureDef;
         f.shape = new b2PolygonShape();
         f.shape.SetAsOrientedBox(0.5 * xlimit / 1200, 12 * ylimit / 900, new b2Vec2(0, 0), 0);
@@ -688,11 +758,24 @@
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (2 * ylimit / 900));
+		bodyDef.userData='cbox';
         var b1 = new b2FixtureDef;
         b1.shape = new b2PolygonShape();
         b1.shape.SetAsOrientedBox(2 * ylimit / 900, 0.5 * xlimit / 1200, new b2Vec2(0, 0), (Math.PI/2));
         var c2b1 = world.CreateBody(bodyDef);
         c2b1.CreateFixture(b1);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+		bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (2 * ylimit / 900));
+		bodyDef.userData='conveyor';
+		var fixDef2 = new b2FixtureDef;
+        fixDef2.shape = new b2CircleShape(5);
+        fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
+        fixDef2.density = 0;
+        fixDef2.isSensor = true;
+        var CC4 = world.CreateBody(bodyDef);
+        CC4.CreateFixture(fixDef2);
 		
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
@@ -708,11 +791,24 @@
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (10 * ylimit / 900));
+		bodyDef.userData='cbox';
         var b2 = new b2FixtureDef;
         b2.shape = new b2PolygonShape();
         b2.shape.SetAsOrientedBox(2 * ylimit / 900, 0.5 * xlimit / 1200, new b2Vec2(0, 0), Math.PI/2);
         var c2b2 = world.CreateBody(bodyDef);
         c2b2.CreateFixture(b2);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+		bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (10 * ylimit / 900));
+		bodyDef.userData='conveyor';
+		var fixDef2 = new b2FixtureDef;
+        fixDef2.shape = new b2CircleShape(5);
+        fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
+        fixDef2.density = 0;
+        fixDef2.isSensor = true;
+        var CC5 = world.CreateBody(bodyDef);
+        CC5.CreateFixture(fixDef2);
 		
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
@@ -728,11 +824,24 @@
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (18 * ylimit / 900));
+		bodyDef.userData='cbox';
         var b3 = new b2FixtureDef;
         b3.shape = new b2PolygonShape();
         b3.shape.SetAsOrientedBox(2 * ylimit / 900,0.5 * xlimit / 1200, new b2Vec2(0, 0), Math.PI/2);
         var c2b3 = world.CreateBody(bodyDef);
         c2b3.CreateFixture(b3);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+		bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (18 * ylimit / 900));
+		bodyDef.userData='conveyor';
+		var fixDef2 = new b2FixtureDef;
+        fixDef2.shape = new b2CircleShape(5);
+        fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
+        fixDef2.density = 0;
+        fixDef2.isSensor = true;
+        var CC6 = world.CreateBody(bodyDef);
+        CC6.CreateFixture(fixDef2);
 		
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
@@ -749,6 +858,7 @@
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(18 * xlimit / 1200, (ylimit / scale) - (16 * ylimit / 900));
+		bodyDef.userData='ground';
         var floor = new b2FixtureDef;
         floor.shape = new b2PolygonShape();
         floor.shape.SetAsOrientedBox(18 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
@@ -759,30 +869,37 @@
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(22 * xlimit / 1200, (ylimit / scale) - (29 * ylimit / 900));
+		bodyDef.userData='carrier';
         var floor2 = new b2FixtureDef;
         floor2.shape = new b2PolygonShape();
         floor2.shape.SetAsOrientedBox(18 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
         var floor2 = world.CreateBody(bodyDef);
         floor2.CreateFixture(floor);
-        var bodyDef = new b2BodyDef;
+        
+		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(13 * xlimit / 1200, (ylimit / scale) - (27 * ylimit / 900));
+		bodyDef.userData='cbox';
         var bx1 = new b2FixtureDef;
         bx1.shape = new b2PolygonShape();
         bx1.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
         var c3b1 = world.CreateBody(bodyDef);
         c3b1.CreateFixture(bx1);
-        var bodyDef = new b2BodyDef;
+        
+		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(25 * xlimit / 1200, (ylimit / scale) - (27 * ylimit / 900));
+		bodyDef.userData='cbox';
         var bx2 = new b2FixtureDef;
         bx2.shape = new b2PolygonShape();
         bx2.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
         var c3b2 = world.CreateBody(bodyDef);
         c3b2.CreateFixture(bx2);
-        var bodyDef = new b2BodyDef;
+        
+		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(37 * xlimit / 1200, (ylimit / scale) - (27 * ylimit / 900));
+		bodyDef.userData='cbox';
         var bx3 = new b2FixtureDef;
         bx3.shape = new b2PolygonShape();
         bx3.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
@@ -794,7 +911,7 @@
             var b = new b2BodyDef();
             for (b = world.GetBodyList(); b; b = b.GetNext())
             {
-                if (b == c1b1 || b == c1b2 || b == c1b3||b==p3||b==p4||b==p5)
+                if (b == c1b1 || b == c1b2 || b == c1b3||b==p3||b==p4||b==p5 ||b==CC1 ||b==CC2 || b==CC3)
                 {
                     //console.log(b.GetPosition());
                     var back1 = new b2Vec2(-3 * xlimit / 1200, b.GetPosition().y);
@@ -806,7 +923,7 @@
                     b.SetPosition(move);
                     //wheel.SetLinearVelocity(move);
                 }
-                if (b == c2b1 || b == c2b2 || b == c2b3 || b == p6 || b == p7 || b == p8)
+                if (b == c2b1 || b == c2b2 || b == c2b3 || b == p6 || b == p7 || b == p8 ||b==CC4 ||b==CC5 || b==CC6)
                 {
                     //console.log(b.GetPosition());
                     var back2 = new b2Vec2(b.GetPosition().x, 32 * ylimit / 900);
@@ -835,117 +952,21 @@
 
         function attach()
         {
-            for (b = world.GetBodyList(); b; b = b.GetNext())
+			for (i = 0; i < pull.length; i++)
             {
-                if (b == c1b1)
-                    if (attached == 1 || attached == 0)
-                    {
-                        if (Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 5 * xlimit / 1200)
-                        {
-                            var set = new b2Vec2(b.GetPosition().x, b.GetPosition().y + 2 * ylimit / 900);
-                            wheel.SetPosition(set);
-                            wheel.ApplyForce(attract, wheel.GetPosition());
-                            wheel.SetLinearVelocity(zero, wheel.GetPosition());
-                            attached = 1;;
-                        }
-                    }
-                if (b == c1b2)
-                    if (attached == 2 || attached == 0)
-                    {
-                        if (Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 5 * xlimit / 1200)
-                        {
-                            var set = new b2Vec2(b.GetPosition().x, b.GetPosition().y + 2 * ylimit / 900);
-                            wheel.SetPosition(set);
-                            wheel.ApplyForce(attract, wheel.GetPosition());
-                            wheel.SetLinearVelocity(zero, wheel.GetPosition());
-                            attached = 2;
-                        }
-                    }
-
-                if (b == c1b3)
-                    if (attached == 3 || attached == 0)
-                    {
-                        if (Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 5 * xlimit / 1200)
-                        {
-                            var set = new b2Vec2(b.GetPosition().x, b.GetPosition().y + 2 * ylimit / 900);
-                            wheel.SetPosition(set);
-                            wheel.ApplyForce(attract, wheel.GetPosition());
-                            wheel.SetLinearVelocity(zero, wheel.GetPosition());
-                            attached = 3;
-                        }
-                    }
-                if (b == c2b1)
-                    if (attached == 4 || attached == 0)
-                    {
-                        if (Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 4 * xlimit / 1200)
-                        {
-                            var set = new b2Vec2(b.GetPosition().x - 1.4 * xlimit / 1200, b.GetPosition().y);
-                            wheel.SetPosition(set);
-                            wheel.ApplyForce(attract, wheel.GetPosition());
-                            wheel.SetLinearVelocity(zero, wheel.GetPosition());
-                            attached = 4;
-                        }
-                    }
-                if (b == c2b2)
-                    if (attached == 5 || attached == 0)
-                    {
-                        if (Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 4 * xlimit / 1200)
-                        {
-                            var set = new b2Vec2(b.GetPosition().x - 1.4 * xlimit / 1200, b.GetPosition().y);
-                            wheel.SetPosition(set);
-                            wheel.ApplyForce(attract, wheel.GetPosition());
-                            wheel.SetLinearVelocity(zero, wheel.GetPosition());
-                            attached = 5;
-                        }
-                    }
-                if (b == c2b3)
-                    if (attached == 6 || attached == 0)
-                    {
-                        if (Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 4 * xlimit / 1200)
-                        {
-                            var set = new b2Vec2(b.GetPosition().x - 1.4 * xlimit / 1200, b.GetPosition().y);
-                            wheel.SetPosition(set);
-                            wheel.ApplyForce(attract, wheel.GetPosition());
-                            wheel.SetLinearVelocity(zero, wheel.GetPosition());
-                            attached = 6;
-                        }
-                    }
-                if (b == c3b1)
-                    if (attached == 7 || attached == 0)
-                    {
-                        if (Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 7 * xlimit / 1200)
-                        {
-                            var set = new b2Vec2(b.GetPosition().x, b.GetPosition().y + 2 * ylimit / 900);
-                            wheel.SetPosition(set);
-                            wheel.ApplyForce(attract, wheel.GetPosition());
-                            wheel.SetLinearVelocity(zero, wheel.GetPosition());
-                            attached = 7;
-                        }
-                    }
-                if (b == c3b2)
-                    if (attached == 8 || attached == 0)
-                    {
-                        if (Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 7 * xlimit / 1200)
-                        {
-                            var set = new b2Vec2(b.GetPosition().x, b.GetPosition().y + 2 * ylimit / 900);
-                            wheel.SetPosition(set);
-                            wheel.ApplyForce(attract, wheel.GetPosition());
-                            wheel.SetLinearVelocity(zero, wheel.GetPosition());
-                            attached = 8;
-                        }
-                    }
-                if (b == c3b3)
-                    if (attached == 9 || attached == 0)
-                    {
-                        if (Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 7 * xlimit / 1200)
-                        {
-                            var set = new b2Vec2(b.GetPosition().x, b.GetPosition().y + 2 * ylimit / 900);
-                            wheel.SetPosition(set);
-                            wheel.ApplyForce(attract, wheel.GetPosition());
-                            wheel.SetLinearVelocity(zero, wheel.GetPosition());
-                            attached = 9;
-                        }
-                    }
+                var c1 = wheel.GetWorldCenter();
+                var c2 = pull[i].GetWorldCenter();
+                var vecnew = new b2Vec2();
+                vecnew.x = c2.x - c1.x;
+                vecnew.y = c2.y - c1.y;
+                var magnew = Math.sqrt(((vecnew.x * vecnew.x) + (vecnew.y * vecnew.y)));
+                vecnew.x = vecnew.x / magnew;
+                vecnew.y = vecnew.y / magnew;
+                var force = new b2Vec2();
+                force.x = 1440 * vecnew.x;
+                force.y = 1440 * vecnew.y;
+                wheel.ApplyForce(force, wheel.GetWorldCenter());
+                wheel.SetAngularDamping(3);
             }
         }
 
@@ -953,16 +974,261 @@
 
         function update1()
         {
-            if (toattach == 1)
+            /*if (toattach == 1)
             {
                 attach();
-            }
+            }*/
             world.Step(1 / 60, 10, 10);
+			/*for (b = world.GetBodyList() ; b; b = b.GetNext())
+			{
+				var angle = b.GetAngle()*(180/Math.PI);
+				for(f = b.GetFixtureList(); f; f = f.GetNext()) {
+		 
+				 if (b.GetUserData() == 'obj')
+				 {
+					 var radius = f.GetShape().GetRadius();
+					 var pos = b.GetPosition();
+		 
+					 ctx.save();
+		 
+					 ctx.translate( pos.x * 30, pos.y * 30 );
+					 ctx.rotate( angle * (Math.PI/180) );
+					 ctx.translate( -pos.x * 30, -pos.y * 30 );
+		 
+					 ctx.beginPath();
+					 ctx.arc(pos.x * 30, pos.y * 30, radius * 30, 0, 2 * Math.PI, false);
+					 ctx.closePath();
+					 ctx.lineWidth = 5;
+					 ctx.strokeStyle = "rgb(255, 255, 0)";
+					 ctx.fillStyle = "rgb(255, 255, 255)";
+					 ctx.stroke();
+					 ctx.fill();
+		 
+					 ctx.restore();
+		 
+				  }
+				  
+				  else if (b.GetUserData() == 'ground')
+				   {    
+					  var vertices;
+					  var ver = new Array;
+					  var temp = new Array;
+					  vertices = f.GetShape().GetVertices();
+					  for(x in vertices)    {
+						temp[x] = b.GetWorldPoint(vertices[x]); 
+					  }
+		 
+					  ver = temp;
+		 
+					  ctx.save();
+		 
+					  ctx.beginPath();
+					  ctx.moveTo(ver[0].x * 30, ver[0].y * 30);
+					  for(var s in ver) {
+						  if(s!=0)
+							ctx.lineTo(ver[s].x * 30, ver[s].y * 30);                     
+					  }
+		 
+					  ctx.closePath();
+		 
+					  ctx.fillStyle = "#FF0000";
+					  ctx.strokeStyle = "#030340";
+					  ctx.lineWidth = 1;
+					  ctx.stroke();
+					  ctx.fill();                     
+		 
+					  ctx.restore();          
+				   }      
+		 
+				  /*else if (b.GetUserData() == 'ground')
+				  { 
+					  var X = f.GetShape().GetVertices()[1].x - f.GetShape().GetVertices()[0].x; 
+					  var Y = f.GetShape().GetVertices()[2].y - f.GetShape().GetVertices()[1].y;    
+					  var pos = b.GetPosition();
+		 
+					  ctx.save();
+		 
+					  ctx.translate( pos.x * 30, pos.y * 30 );
+					  ctx.rotate( angle * (Math.PI/180) );
+					  ctx.translate( -pos.x * 30, -pos.y * 30 );
+		 
+					  ctx.lineWidth = 3;
+					  ctx.strokeStyle = "rgb(33, 212, 125)";
+					  ctx.strokeRect(((pos.x * 30) - (X * 30 / 2)), ((pos.y * 30) - (Y * 30 / 2)), X * 30, Y * 30);
+					  ctx.fillStyle = "rgb(255, 40, 100)";
+					  ctx.fillRect(((pos.x * 30) - (X * 30 / 2)), ((pos.y * 30) - (Y * 30 / 2)), X * 30, Y * 30);
+		 
+					  ctx.restore();
+		 
+				   }
+				   else if (b.GetUserData() == 'carrier')
+				   {    
+					  var vertices;
+					  var ver = new Array;
+					  var temp = new Array;
+					  vertices = f.GetShape().GetVertices();
+					  for(x in vertices)    {
+						temp[x] = b.GetWorldPoint(vertices[x]); 
+					  }
+		 
+					  ver = temp;
+		 
+					  ctx.save();
+		 
+					  ctx.beginPath();
+					  ctx.moveTo(ver[0].x * 30, ver[0].y * 30);
+					  for(var s in ver) {
+						  if(s!=0)
+							ctx.lineTo(ver[s].x * 30, ver[s].y * 30);                     
+					  }
+		 
+					  ctx.closePath();
+		 
+					  ctx.fillStyle = "#FF0000";
+					  ctx.strokeStyle = "#030340";
+					  ctx.lineWidth = 1;
+					  ctx.stroke();
+					  ctx.fill();                     
+		 
+					  ctx.restore();          
+				   }      
+					/*else if (b.GetUserData() == 'carrier')
+					{ 
+					  var X = f.GetShape().GetVertices()[1].x - f.GetShape().GetVertices()[0].x; 
+					  var Y = f.GetShape().GetVertices()[2].y - f.GetShape().GetVertices()[1].y;    
+					  var pos = b.GetPosition();
+		 
+					  ctx.save();
+		 
+					  ctx.translate( pos.x * 30, pos.y * 30 );
+					  ctx.rotate( angle * (Math.PI/180) );
+					  ctx.translate( -pos.x * 30, -pos.y * 30 );
+		 
+					  ctx.lineWidth = 3;
+					  ctx.strokeStyle = "rgb(255, 40, 100)";
+					  ctx.strokeRect(((pos.x * 30) - (X * 30 / 2)), ((pos.y * 30) - (Y * 30 / 2)), X * 30, Y * 30);
+					  ctx.fillStyle = "rgb(255, 40, 100)";
+					  ctx.fillRect(((pos.x * 30) - (X * 30 / 2)), ((pos.y * 30) - (Y * 30 / 2)), X * 30, Y * 30);
+		 
+					  ctx.restore();
+		 
+					}
+					else if (b.GetUserData() == 'cbox')
+				   {    
+					  var vertices;
+					  var ver = new Array;
+					  var temp = new Array;
+					  vertices = f.GetShape().GetVertices();
+					  for(x in vertices)    {
+						temp[x] = b.GetWorldPoint(vertices[x]); 
+					  }
+		 
+					  ver = temp;
+		 
+					  ctx.save();
+		 
+					  ctx.beginPath();
+					  ctx.moveTo(ver[0].x * 30, ver[0].y * 30);
+					  for(var s in ver) {
+						  if(s!=0)
+							ctx.lineTo(ver[s].x * 30, ver[s].y * 30);                     
+					  }
+		 
+					  ctx.closePath();
+		 
+					  ctx.fillStyle = "#FF0000";
+					  ctx.strokeStyle = "#030340";
+					  ctx.lineWidth = 1;
+					  ctx.stroke();
+					  ctx.fill();                     
+		 
+					  ctx.restore();          
+				   }      
+					/*else if (b.GetUserData() == 'cbox')
+					{ 
+					  var X = f.GetShape().GetVertices()[1].x - f.GetShape().GetVertices()[0].x; 
+					  var Y = f.GetShape().GetVertices()[2].y - f.GetShape().GetVertices()[1].y;    
+					  var pos = b.GetPosition();
+		 
+					  ctx.save();
+		 
+					  ctx.translate( pos.x * 30, pos.y * 30 );
+					  ctx.rotate( angle * (Math.PI/180) );
+					  ctx.translate( -pos.x * 30, -pos.y * 30 );
+		 
+					  ctx.lineWidth = 3;
+					  ctx.strokeStyle = "rgb(25, 40, 100)";
+					  ctx.strokeRect(((pos.x * 30) - (X * 30 / 2)), ((pos.y * 30) - (Y * 30 / 2)), X * 30, Y * 30);
+					  ctx.fillStyle = "rgb(25, 40, 100)";
+					  ctx.fillRect(((pos.x * 30) - (X * 30 / 2)), ((pos.y * 30) - (Y * 30 / 2)), X * 30, Y * 30);
+		 
+					  ctx.restore();
+		 
+					}
+					else if (b.GetUserData() == 'conveyor')
+				   {    
+					  var vertices;
+					  var ver = new Array;
+					  var temp = new Array;
+					  vertices = f.GetShape().GetVertices();
+					  for(x in vertices)    {
+						temp[x] = b.GetWorldPoint(vertices[x]); 
+					  }
+		 
+					  ver = temp;
+		 
+					  ctx.save();
+		 
+					  ctx.beginPath();
+					  ctx.moveTo(ver[0].x * 30, ver[0].y * 30);
+					  for(var s in ver) {
+						  if(s!=0)
+							ctx.lineTo(ver[s].x * 30, ver[s].y * 30);                     
+					  }
+		 
+					  ctx.closePath();
+		 
+					  ctx.fillStyle = "#FF0000";
+					  ctx.strokeStyle = "#030340";
+					  ctx.lineWidth = 1;
+					  ctx.stroke();
+					  ctx.fill();                     
+		 
+					  ctx.restore();          
+				   }      
+					/*else if (b.GetUserData() == 'conveyor')
+					{ 
+					  var X = f.GetShape().GetVertices()[1].x - f.GetShape().GetVertices()[0].x; 
+					  var Y = f.GetShape().GetVertices()[2].y - f.GetShape().GetVertices()[1].y;    
+					  var pos = b.GetPosition();
+		 
+					  ctx.save();
+		 
+					  ctx.translate( pos.x * 30, pos.y * 30 );
+					  ctx.rotate( angle * (Math.PI/180) );
+					  ctx.translate( -pos.x * 30, -pos.y * 30 );
+		 
+					  ctx.lineWidth = 3;
+					  ctx.strokeStyle = "rgb(33, 212, 125)";
+					  ctx.strokeRect(((pos.x * 30) - (X * 30 / 2)), ((pos.y * 30) - (Y * 30 / 2)), X * 30, Y * 30);
+					  ctx.fillStyle = "rgb(255, 40, 100)";
+					  ctx.fillRect(((pos.x * 30) - (X * 30 / 2)), ((pos.y * 30) - (Y * 30 / 2)), X * 30, Y * 30);
+		 
+					  ctx.restore();
+		 
+					}
+				                      
+				}
+			}*/
             world.DrawDebugData();
             world.ClearForces();
             world.SetContactListener(listener);
             //fpsa.innerHTML = fps.getFPS();
             conveyor_motion();
+			if(count==1)
+			{
+				attach();
+			}
 			if(shouldmove==1)
 			{
 				wheel.SetPosition(newpo);
@@ -1003,11 +1269,15 @@
             else
             {
 				wheel.SetLinearVelocity(zero);
+				wheel.SetAngularVelocity(0);
                 console.log("Done");
                 level2();
             }
         }
     }
+	
+	var winx2 =19 * scale * xlimit / 1200;
+    var winy2 = ylimit - (17 * scale * ylimit / 900);
 	
 	function level2()
     {
@@ -1016,6 +1286,8 @@
             if (b != wheel)
                 world.DestroyBody(b);
         }
+		var start2=new b2Vec2(5*xlimit/1200,10*ylimit/900);
+		wheel.SetPosition(start2);
         console.log("Second level");
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
@@ -1089,7 +1361,7 @@
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(19 * xlimit / 1200, (ylimit / scale) - (21 * ylimit / 900));
-		bodyDef.userData='bounce23443';
+		bodyDef.userData='bounce';
         var fd1 = new b2FixtureDef;
         fd1.shape = new b2PolygonShape;
         fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 1.2 * ylimit / 900, new b2Vec2(0, 0), 0);
@@ -1139,9 +1411,25 @@
                 ctx.closePath();
                 ctx.fill();
             }
+			ctx.fillStyle = 'rgba(145,145,255,0.5)';
+            ctx.beginPath();
+            ctx.arc(winx2, winy2, 30 * (xlimit + ylimit) / (1200 + 900), 0, Math.PI * 2, false);
+            ctx.closePath();
+            ctx.fill();
             if (scope == 1)
                 ray();
-            var frame2 = window.requestAnimationFrame(update2);
+			if (Math.sqrt(Math.pow(wheel.GetPosition().x * scale - winx2, 2) + Math.pow(wheel.GetPosition().y * scale - winy2, 2)) > 50)
+            {
+                var frame2 = window.requestAnimationFrame(update2);
+            }
+            else
+            {
+				wheel.SetLinearVelocity(zero);
+				wheel.SetAngularVelocity(0);
+                console.log("Done");
+                level1();
+            }
+            //var frame2 = window.requestAnimationFrame(update2);
         };
     }
 	
