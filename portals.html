@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <title>Portal</title>
     <script type="text/javascript" src="Box2D.js"></script>
+	<script type="text/javascript" src="Box2dWeb-2.1.a.3.js"></script>
     <script type="text/javascript" src="jquery-1.7.1.min.js"></script>
     <style>
         html,
@@ -770,7 +771,7 @@
 		bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (2 * ylimit / 900));
 		bodyDef.userData='conveyor';
 		var fixDef2 = new b2FixtureDef;
-        fixDef2.shape = new b2CircleShape(5);
+        fixDef2.shape = new b2CircleShape(3);
         fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
         fixDef2.density = 0;
         fixDef2.isSensor = true;
@@ -803,7 +804,7 @@
 		bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (10 * ylimit / 900));
 		bodyDef.userData='conveyor';
 		var fixDef2 = new b2FixtureDef;
-        fixDef2.shape = new b2CircleShape(5);
+        fixDef2.shape = new b2CircleShape(3);
         fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
         fixDef2.density = 0;
         fixDef2.isSensor = true;
@@ -836,7 +837,7 @@
 		bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (18 * ylimit / 900));
 		bodyDef.userData='conveyor';
 		var fixDef2 = new b2FixtureDef;
-        fixDef2.shape = new b2CircleShape(5);
+        fixDef2.shape = new b2CircleShape(3);
         fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
         fixDef2.density = 0;
         fixDef2.isSensor = true;
@@ -857,7 +858,7 @@
         // intermediate floor
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
-        bodyDef.position.Set(18 * xlimit / 1200, (ylimit / scale) - (16 * ylimit / 900));
+        bodyDef.position.Set(18 * xlimit / 1200, (ylimit / scale) - (17 * ylimit / 900));
 		bodyDef.userData='ground';
         var floor = new b2FixtureDef;
         floor.shape = new b2PolygonShape();
@@ -979,7 +980,7 @@
                 attach();
             }*/
             world.Step(1 / 60, 10, 10);
-			/*for (b = world.GetBodyList() ; b; b = b.GetNext())
+			for (b = world.GetBodyList() ; b; b = b.GetNext())
 			{
 				var angle = b.GetAngle()*(180/Math.PI);
 				for(f = b.GetFixtureList(); f; f = f.GetNext()) {
@@ -1040,7 +1041,7 @@
 					  ctx.restore();          
 				   }      
 		 
-				  /*else if (b.GetUserData() == 'ground')
+				  else if (b.GetUserData() == 'ground')
 				  { 
 					  var X = f.GetShape().GetVertices()[1].x - f.GetShape().GetVertices()[0].x; 
 					  var Y = f.GetShape().GetVertices()[2].y - f.GetShape().GetVertices()[1].y;    
@@ -1092,7 +1093,7 @@
 		 
 					  ctx.restore();          
 				   }      
-					/*else if (b.GetUserData() == 'carrier')
+					else if (b.GetUserData() == 'carrier')
 					{ 
 					  var X = f.GetShape().GetVertices()[1].x - f.GetShape().GetVertices()[0].x; 
 					  var Y = f.GetShape().GetVertices()[2].y - f.GetShape().GetVertices()[1].y;    
@@ -1144,7 +1145,7 @@
 		 
 					  ctx.restore();          
 				   }      
-					/*else if (b.GetUserData() == 'cbox')
+					else if (b.GetUserData() == 'cbox')
 					{ 
 					  var X = f.GetShape().GetVertices()[1].x - f.GetShape().GetVertices()[0].x; 
 					  var Y = f.GetShape().GetVertices()[2].y - f.GetShape().GetVertices()[1].y;    
@@ -1196,7 +1197,7 @@
 		 
 					  ctx.restore();          
 				   }      
-					/*else if (b.GetUserData() == 'conveyor')
+					else if (b.GetUserData() == 'conveyor')
 					{ 
 					  var X = f.GetShape().GetVertices()[1].x - f.GetShape().GetVertices()[0].x; 
 					  var Y = f.GetShape().GetVertices()[2].y - f.GetShape().GetVertices()[1].y;    
@@ -1219,8 +1220,8 @@
 					}
 				                      
 				}
-			}*/
-            world.DrawDebugData();
+			}
+            //world.DrawDebugData();
             world.ClearForces();
             world.SetContactListener(listener);
             //fpsa.innerHTML = fps.getFPS();
