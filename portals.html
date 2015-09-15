@@ -96,6 +96,7 @@
     var circle = 0;
     var x;
     var y;
+	
 	var tempbody = new b2BodyDef();
 	tempbody.type = b2Body.b2_staticBody;
     tempbody.position.Set(0,0);
@@ -130,6 +131,7 @@
 	var magx;
 	var magy;
 	var mag;
+	var relang;
 	
 	//bounce variable
 	var shouldbounce=0;
@@ -200,55 +202,36 @@
     //GLOBAL: portals function to exchange position
     function portals(tempbody,tempbody2)
     {
-		//console.log(tempbody);
 		if(current==0)
 		{
-		//alert("Inside fnc");
-		//console.log(tempbody.GetPosition());
-		ang=tempbody.GetAngle()+Math.PI/2;
+		relang=tempbody2.GetAngle()-tempbody.GetAngle()+Math.PI;
 		magx=wheel.GetLinearVelocity().x;
 		magy=wheel.GetLinearVelocity().y;
-		mag=Math.sqrt(Math.pow(magx,2)+Math.pow(magy,2));
-		velocityangle=Math.acos(magx/mag);
-		alpha1=tempbody2.GetAngle();
-		theta=alpha1+velocityangle;
-		vel.x=mag*Math.sin(ang+theta);
-		vel.y=mag*Math.cos(ang+theta);
-		//vel.x=wheel.GetLinearVelocity().x*Math.cos(ang)+wheel.GetLinearVelocity().x*Math.sin(ang);
-		//vel.y=wheel.GetLinearVelocity().y*Math.sin(ang)+wheel.GetLinearVelocity().y*Math.cos(ang);
+		vel.x=-(magx*Math.cos(relang)+magy*Math.sin(relang));
+		vel.y=-magx*Math.sin(relang)+magy*Math.cos(relang);
 		newpo.x=tempbody.GetPosition().x;
 		newpo.y=tempbody.GetPosition().y;
-		//console.log(newpo);
 		shouldmove=1;
-		//console.log(wheel.GetPosition());
 		current=1;
 		}
-        /*else if (wheel.GetPosition().x * scale != blueportal.x && wheel.GetPosition().y * scale != portalsystem.blueportal.y && wheel.GetPosition().x * scale != portalsystem.redportal.x && wheel.GetPosition().y * scale != portalsystem.redportal.y)
-            current = 0;*/
     }
 
 	var redportal = 
 	{
-	//var id:1,
         draw: function()
         {
-			//ctx.rotate(temp.GetAngle());
             ctx.fillStyle = this.color;
 			ctx.fillRect(temp.GetPosition().x*scale*xlimit/1200,temp.GetPosition().y*scale*ylimit/900, 2*scale*xlimit/1200,0.3*scale*ylimit/900 );
-			//ctx.rotate(0);
 			
         }
     };
 	
     var blueportal = 
 	{
-	//var id:2,
         draw: function()
         {
-			//ctx.rotate(temp2.GetAngle());
             ctx.fillStyle = blueportal.color;
 			ctx.fillRect(temp2.GetPosition().x*scale*xlimit/1200,temp2.GetPosition().y*scale*ylimit/900, 2*scale*xlimit/1200,0.3*scale*ylimit/900 );
-			//ctx.rotate(0);
         }
     };
 	
@@ -273,13 +256,11 @@
     {
         x = e.clientX;
         y = e.clientY;
-        //cursor = "Your Mouse Position Is : " + x + " and " + y;
-        //document.getElementById("displayArea").innerHTML=cursor;
     }
 
     function stopTracking()
     {
-        //document.getElementById("displayArea").innerHTML="";
+
     }
 
 	var pull = [];
@@ -298,15 +279,15 @@
             {
                 if (sA) // If Fixture A is a Sensor
                 {
-					
-					//alert("here187687");
-					if(AUD=='portal' && BUD=='obj' && fbA==temp && (pcreate==2||pcreate==20))
+					CUD=temp2.GetUserData();
+					DUD=temp.GetUserData();
+					if(AUD=='portal' && CUD=='portal' && BUD=='obj' && fbA==temp && (pcreate==2||pcreate==20))
 					{
 					//alert("here1");
 					fxB.SetRestitution(1);
                     portals(temp2,temp);
 					}
-					else if(AUD=='portal' && BUD=='obj' && fbA==temp2 && (pcreate==2||pcreate==20))
+					else if(AUD=='portal' && DUD=='portal' && BUD=='obj' && fbA==temp2 && (pcreate==2||pcreate==20))
 					{
 					fxB.SetRestitution(1);
 					//alert("here2");
@@ -325,13 +306,15 @@
                 }
                 else // If Fixture B is a Sensor
                 {
-                    if(BUD=='portal' && AUD=='obj' && fbB==temp && (pcreate==2||pcreate==20))
+					CUD=temp2.GetUserData();
+					DUD=temp.GetUserData();
+                    if(BUD=='portal' && CUD=='portal' && AUD=='obj' && fbB==temp && (pcreate==2||pcreate==20))
 					{
 					fxA.SetRestitution(1);
 					//alert("here3");
 					portals(temp2,temp);
 					}
-					else if(BUD=='portal' && AUD=='obj' && fbB==temp2 && (pcreate==2||pcreate==20))
+					else if(BUD=='portal' && DUD=='portal' && AUD=='obj' && fbB==temp2 && (pcreate==2||pcreate==20))
 					{
 					fxA.SetRestitution(1);
 					//alert("here4");
@@ -363,14 +346,15 @@
 			 if((sA && !sB) || (sB && !sA))	{
 				 if(sA)	
 				 {
-					//alert("Here00011245");
-					if(AUD=='portal' && BUD=='obj' && fbA==temp && (pcreate==2||pcreate==20))
+					CUD=temp2.GetUserData();
+					DUD=temp.GetUserData();
+					if(AUD=='portal' && CUD=='portal' && BUD=='obj' && fbA==temp && (pcreate==2||pcreate==20))
 					{
 						fxB.SetRestitution(0.6);
 						//alert("Here0001");
 						current=0;
 					}
-					else if(AUD=='portal' && BUD=='obj' && fbA==temp2 && (pcreate==2||pcreate==20))
+					else if(AUD=='portal' && DUD=='portal' && BUD=='obj' && fbA==temp2 && (pcreate==2||pcreate==20))
 					{
 						fxB.SetRestitution(0.6);
 						//alert("Here0002");
@@ -385,14 +369,15 @@
 				 }
 				 else	
 				 {
-					//alert("Here000223557");
-					if(BUD=='portal' && AUD=='obj' && fbB==temp && (pcreate==2||pcreate==20))
+					CUD=temp2.GetUserData();
+					DUD=temp.GetUserData();
+					if(BUD=='portal' && CUD=='portal' && AUD=='obj' && fbB==temp && (pcreate==2||pcreate==20))
 					{
 						fxA.SetRestitution(0.6);
 						//alert("Here0003");
 						current=0;
 					}
-					else if(BUD=='portal' && AUD=='obj' && fbB==temp2 && (pcreate==2||pcreate==20))
+					else if(BUD=='portal' && DUD=='portal' && AUD=='obj' && fbB==temp2 && (pcreate==2||pcreate==20))
 					{
 						fxA.SetRestitution(0.6);
 						//alert("Here0004");
@@ -409,7 +394,6 @@
 	
     function ray()
     {
-        //detector.SetPosition(zero);
         var k = 360 / 5;
         var t = k / 60;
         p2.x = x / scale;
@@ -432,15 +416,23 @@
                 {
                     closestFraction = output.fraction;
                     intersectionNormal = output.normal;
-					if(pcreate==1)
+					if(pcreate==1 && gah=='portal' && temp2!=b)
 					{
 						temp=b;
 						pcreate=10;
 					}
-					if(pcreate==2)
+					if(pcreate==1 && gah!='portal')
+					{
+						pcreate=0;
+					}
+					if(pcreate==2 && gah=='portal' && temp!=b)
 					{
 						temp2=b;
 						pcreate=20;
+					}
+					if(pcreate==2 && gah!='portal')
+					{
+						pcreate=1;
 					}
                 }
             }
@@ -459,30 +451,11 @@
         ctx.closePath();
         ctx.stroke();
         ctx.lineWidth = 1;
-
-        //var rayangle = Math.tan(Math.abs(wheel.GetPosition().y - intersectionPoint.y) / Math.abs(wheel.GetPosition().x - intersectionPoint.x));
-
-        //detector.SetPositionAndAngle(new b2Vec2(intersectionPoint.x,intersectionPoint.y),rayangle);
-
-        /*if(count!=0)
-        {
-        	if (portalsystem.redportal.exist == 0)
-        	{
-        		portalsystem.redportal.x = intersectionPoint.x *scale;
-        		portalsystem.redportal.y = intersectionPoint.y *scale;
-        	}
-        	if (portalsystem.blueportal.exist == 0)
-        	{
-        		portalsystem.blueportal.x = wheel.GetPosition().x*scale;
-        		portalsystem.blueportal.y = wheel.GetPosition().y*scale;
-        	}
-        }*/
     }
 
     function downkeyhandler(event)
     {
         var keycode = event.which;
-        //console.log("We're in down");
         switch (keycode)
         {
             case 32:if (count == 0) count = 1;
@@ -543,24 +516,9 @@
         var keycode = event.which;
         switch (keycode)
         {
-			//case 32:if (count == 1) count = 0;
-					//break;
-                /*if (attached == 1 || attached == 2 || attached == 3) wheel.ApplyImpulse(f1, wheel.GetPosition());
-                else if (attached == 4 || attached == 5 || attached == 6) wheel.ApplyImpulse(f2, wheel.GetPosition());
-                else if (attached == 7 || attached == 8 || attached == 9) wheel.ApplyImpulse(f3, wheel.GetPosition());
-                toattach = 0;
-                attached = 0;
-                levattach = 0;
-                levattached = 0;
-                if (count == 0) count = 1;*/
-            case 79:
-                circle = 0;
-                break;
-                //case 80:scope = 0;
-                //break;
-
-            default:
-                break;
+            case 79:circle = 0;
+					break;
+            default:break;
         }
     }
 
@@ -586,6 +544,47 @@
 		var start2=new b2Vec2(4*xlimit/1200,25*ylimit/900);
 		wheel.SetPosition(start2);
 		console.log("Inside level1");
+		
+		var mag1=0;
+		var mag2=0;
+		var mag3=0;
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(-1 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
+        var border1 = world.CreateBody(bodyDef);
+        border1.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) - (31 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(20 * xlimit / 1200, 1* ylimit / 900);
+        var border2 = world.CreateBody(bodyDef);
+        border2.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(41 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
+        var border3 = world.CreateBody(bodyDef);
+        border3.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) + (9 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(20 * xlimit / 1200, 1 * ylimit / 900);
+        var border4 = world.CreateBody(bodyDef);
+        border4.CreateFixture(fd);
+		
         // Ground 1
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
@@ -633,18 +632,18 @@
         // First floor
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
-        bodyDef.position.Set(18 * xlimit / 1200, (ylimit / scale) - (12 * ylimit / 900));
+        bodyDef.position.Set(17 * xlimit / 1200, (ylimit / scale) - (11 * ylimit / 900));
 		bodyDef.userData='carrier';
         var floor = new b2FixtureDef;
         floor.shape = new b2PolygonShape();
-        floor.shape.SetAsOrientedBox(18 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        floor.shape.SetAsOrientedBox(17 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
         var firstfloor = world.CreateBody(bodyDef);
         firstfloor.CreateFixture(floor);
 
         //c1b1
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
-        bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+        bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (9 * ylimit / 900));
 		bodyDef.userData='cbox';
         var box1 = new b2FixtureDef;
         box1.shape = new b2PolygonShape();
@@ -654,7 +653,7 @@
 			
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
-		bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+		bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (9 * ylimit / 900));
 		bodyDef.userData='conveyor';
 		var fixDef2 = new b2FixtureDef;
         fixDef2.shape = new b2CircleShape(5);
@@ -666,7 +665,7 @@
         
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
-        bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (8.9 * ylimit / 900));
+        bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (7.9 * ylimit / 900));
 		bodyDef.userData='portal';
 		var fd1 = new b2FixtureDef;
         fd1.shape = new b2PolygonShape;
@@ -677,7 +676,7 @@
 		
 
         //c1b2
-        var bodyDef = new b2BodyDef;
+        /*var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(15 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
 		bodyDef.userData='cbox';
@@ -743,7 +742,7 @@
         fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), 0);
         fd1.isSensor = true;
 		var p5= world.CreateBody(bodyDef);
-		p5.CreateFixture(fd1);
+		p5.CreateFixture(fd1);*/
 
         //lift
         var bodyDef = new b2BodyDef;
@@ -771,12 +770,12 @@
 		bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (2 * ylimit / 900));
 		bodyDef.userData='conveyor';
 		var fixDef2 = new b2FixtureDef;
-        fixDef2.shape = new b2CircleShape(3);
+        fixDef2.shape = new b2CircleShape(5);
         fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
         fixDef2.density = 0;
         fixDef2.isSensor = true;
-        var CC4 = world.CreateBody(bodyDef);
-        CC4.CreateFixture(fixDef2);
+        var CC2 = world.CreateBody(bodyDef);
+        CC2.CreateFixture(fixDef2);
 		
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
@@ -786,10 +785,10 @@
         fd1.shape = new b2PolygonShape;
         fd1.shape.SetAsOrientedBox(1 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), (Math.PI)/2);
         fd1.isSensor = true;
-		var p6= world.CreateBody(bodyDef);
-		p6.CreateFixture(fd1);
+		var p4= world.CreateBody(bodyDef);
+		p4.CreateFixture(fd1);
 		
-        var bodyDef = new b2BodyDef;
+        /*var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (10 * ylimit / 900));
 		bodyDef.userData='cbox';
@@ -853,12 +852,12 @@
         fd1.shape.SetAsOrientedBox(1 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), (Math.PI)/2);
         fd1.isSensor = true;
 		var p8= world.CreateBody(bodyDef);
-		p8.CreateFixture(fd1);
+		p8.CreateFixture(fd1);*/
 
         // intermediate floor
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
-        bodyDef.position.Set(18 * xlimit / 1200, (ylimit / scale) - (17 * ylimit / 900));
+        bodyDef.position.Set(18 * xlimit / 1200, (ylimit / scale) - (16 * ylimit / 900));
 		bodyDef.userData='ground';
         var floor = new b2FixtureDef;
         floor.shape = new b2PolygonShape();
@@ -879,15 +878,40 @@
         
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
-        bodyDef.position.Set(13 * xlimit / 1200, (ylimit / scale) - (27 * ylimit / 900));
+        bodyDef.position.Set(7 * xlimit / 1200, (ylimit / scale) - (27 * ylimit / 900));
 		bodyDef.userData='cbox';
         var bx1 = new b2FixtureDef;
         bx1.shape = new b2PolygonShape();
         bx1.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
         var c3b1 = world.CreateBody(bodyDef);
         c3b1.CreateFixture(bx1);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+		bodyDef.position.Set(7 * xlimit / 1200, (ylimit / scale) - (27 * ylimit / 900));
+		bodyDef.userData='conveyor';
+		var fixDef2 = new b2FixtureDef;
+        fixDef2.shape = new b2CircleShape(6);
+        fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
+        fixDef2.density = 0;
+        fixDef2.isSensor = true;
+        var CC3 = world.CreateBody(bodyDef);
+        CC3.CreateFixture(fixDef2);
         
 		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(7 * xlimit / 1200, (ylimit / scale) - (25.9 * ylimit / 900));
+		bodyDef.userData='portal';
+		var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        fd1.isSensor = true;
+		var p5= world.CreateBody(bodyDef);
+		p5.CreateFixture(fd1);
+		
+		
+        
+		/*var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(25 * xlimit / 1200, (ylimit / scale) - (27 * ylimit / 900));
 		bodyDef.userData='cbox';
@@ -905,9 +929,50 @@
         bx3.shape = new b2PolygonShape();
         bx3.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
         var c3b3 = world.CreateBody(bodyDef);
-        c3b3.CreateFixture(bx3);
+        c3b3.CreateFixture(bx3);*/
+		
+		function conveyor_motion()
+        {
+            var b = new b2BodyDef();
+            for (b = world.GetBodyList(); b; b = b.GetNext())
+            {
+                if (b == c1b1 || b == p3 || b == CC1)
+                {
+                    if (b.GetPosition().x >= 31 * xlimit / 1200)
+                        mag1=-0.1;
+					if(b.GetPosition().x <= 3 * xlimit / 1200)
+						mag1=0.1;
+                    var movex = b.GetPosition().x + (mag1 * xlimit / 1200);
+                    var movey = b.GetPosition().y;
+                    var move = new b2Vec2(movex, movey);
+                    b.SetPosition(move);
+                }
+				if (b == c2b1 || b == p4 || b == CC2)
+                {
+                    if (b.GetPosition().y >= 27 * ylimit / 900)
+                        mag2=-0.2;
+					if (b.GetPosition().y <= 8 * ylimit / 900)
+						mag2=0.2;
+                    var movey = b.GetPosition().y + (mag2 * ylimit / 900);
+                    var movex = b.GetPosition().x;
+                    var move = new b2Vec2(movex, movey);
+                    b.SetPosition(move);
+                }
+				if (b == c3b1 || b == p5 || b == CC3)
+                {
+                    if (b.GetPosition().x >= 37 * xlimit / 1200)
+                        mag3=-0.1;
+					if(b.GetPosition().x <= 7 * xlimit / 1200)
+						mag3=0.1;
+                    var movex = b.GetPosition().x + (mag3 * xlimit / 1200);
+                    var movey = b.GetPosition().y;
+                    var move = new b2Vec2(movex, movey);
+                    b.SetPosition(move);
+                }
+            }
+        }
 
-        function conveyor_motion()
+        /*function conveyor_motion()
         {
             var b = new b2BodyDef();
             for (b = world.GetBodyList(); b; b = b.GetNext())
@@ -949,7 +1014,7 @@
                     //wheel.SetLinearVelocity(move);
                 }
             }
-        }
+        }*/
 
         function attach()
         {
@@ -964,10 +1029,10 @@
                 vecnew.x = vecnew.x / magnew;
                 vecnew.y = vecnew.y / magnew;
                 var force = new b2Vec2();
-                force.x = 1440 * vecnew.x;
-                force.y = 1440 * vecnew.y;
+                force.x = 1500 * vecnew.x;
+                force.y = 2500 * vecnew.y;
                 wheel.ApplyForce(force, wheel.GetWorldCenter());
-                wheel.SetAngularDamping(3);
+                wheel.SetAngularDamping(10);
             }
         }
 
@@ -1271,6 +1336,7 @@
             {
 				wheel.SetLinearVelocity(zero);
 				wheel.SetAngularVelocity(0);
+				pcreate=0;
                 console.log("Done");
                 level2();
             }
@@ -1284,12 +1350,52 @@
             if (b != wheel)
                 world.DestroyBody(b);
         }
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(-1 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
+        var border1 = world.CreateBody(bodyDef);
+        border1.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) - (31 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(20 * xlimit / 1200, 1* ylimit / 900);
+        var border2 = world.CreateBody(bodyDef);
+        border2.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(41 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
+        var border3 = world.CreateBody(bodyDef);
+        border3.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) + (9 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(20 * xlimit / 1200, 1 * ylimit / 900);
+        var border4 = world.CreateBody(bodyDef);
+        border4.CreateFixture(fd);
+		
 		var winx2 =19 * scale * xlimit / 1200;
 		var winy2 = ylimit - (17 * scale * ylimit / 900);
+		
 		var start2=new b2Vec2(5*xlimit/1200,10*ylimit/900);
 		wheel.SetPosition(start2);
-        console.log("Second level");
-        var bodyDef = new b2BodyDef;
+        
+		console.log("Second level");
+        
+		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(5 * xlimit / 1200, (ylimit / scale) - (1 * ylimit / 900));
         var fd = new b2FixtureDef;
@@ -1426,6 +1532,7 @@
             {
 				wheel.SetLinearVelocity(zero);
 				wheel.SetAngularVelocity(0);
+				pcreate=0;
                 console.log("Done");
                 level3();
             }
@@ -1450,6 +1557,42 @@
 		
 		var mag=0;
         
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(-1 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
+        var border1 = world.CreateBody(bodyDef);
+        border1.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) - (31 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(20 * xlimit / 1200, 1* ylimit / 900);
+        var border2 = world.CreateBody(bodyDef);
+        border2.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(41 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
+        var border3 = world.CreateBody(bodyDef);
+        border3.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) + (9 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(20 * xlimit / 1200, 1 * ylimit / 900);
+        var border4 = world.CreateBody(bodyDef);
+        border4.CreateFixture(fd);
+		
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(10 * xlimit / 1200, (ylimit / scale) - (1 * ylimit / 900));
@@ -1577,6 +1720,7 @@
             {
 				wheel.SetLinearVelocity(zero);
 				wheel.SetAngularVelocity(0);
+				pcreate=0;
                 console.log("Done");
                 level4();
             }
@@ -1601,6 +1745,42 @@
 		
 		var mag=0;
         
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(-1 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
+        var border1 = world.CreateBody(bodyDef);
+        border1.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) - (31 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(20 * xlimit / 1200, 1* ylimit / 900);
+        var border2 = world.CreateBody(bodyDef);
+        border2.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(41 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
+        var border3 = world.CreateBody(bodyDef);
+        border3.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) + (9 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(20 * xlimit / 1200, 1 * ylimit / 900);
+        var border4 = world.CreateBody(bodyDef);
+        border4.CreateFixture(fd);
+		
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(5 * xlimit / 1200, (ylimit / scale) - (1 * ylimit / 900));
@@ -1695,6 +1875,154 @@
             {
 				wheel.SetLinearVelocity(zero);
 				wheel.SetAngularVelocity(0);
+				pcreate=0;
+                console.log("Done");
+                level5();
+            }
+            //var frame2 = window.requestAnimationFrame(update2);
+        };
+    }
+	
+	function level5()
+    {
+        for (b = world.GetBodyList(); b; b = b.GetNext())
+        {
+            if (b != wheel)
+                world.DestroyBody(b);
+        }
+		
+		var winx4 =35 * scale * xlimit / 1200;
+		var winy4 = ylimit - (18 * scale * ylimit / 900);
+		
+		var start5=new b2Vec2(5*xlimit/1200,22*ylimit/900);
+		wheel.SetPosition(start5);
+        console.log("Second level");
+		
+		var mag=0;
+        
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(-1 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
+        var border1 = world.CreateBody(bodyDef);
+        border1.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) - (31 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(20 * xlimit / 1200, 1* ylimit / 900);
+        var border2 = world.CreateBody(bodyDef);
+        border2.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(41 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
+        var border3 = world.CreateBody(bodyDef);
+        border3.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) + (9 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(20 * xlimit / 1200, 1 * ylimit / 900);
+        var border4 = world.CreateBody(bodyDef);
+        border4.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(5 * xlimit / 1200, (ylimit / scale) - (1 * ylimit / 900));
+		bodyDef.userData='ground';
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(5 * xlimit / 1200, 1 * ylimit / 900);
+        var ground = world.CreateBody(bodyDef);
+        ground.CreateFixture(fd);
+		
+        var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(5 * xlimit / 1200, (ylimit / scale) - (22 * ylimit / 900));
+		bodyDef.userData='ground';
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsOrientedBox(5 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), Math.PI);
+        var roof = world.CreateBody(bodyDef);
+        roof.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(5 * xlimit / 1200, (ylimit / scale) - (2.1 * ylimit / 900));
+		bodyDef.userData='portal';
+        var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        fd1.isSensor = true;
+		var p1 = world.CreateBody(bodyDef);
+        p1.CreateFixture(fd1);
+		p1.SetAngle(0);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(5 * xlimit / 1200, (ylimit / scale) - (20.9 * ylimit / 900));
+		bodyDef.userData='portal';
+        var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        fd1.isSensor = true;
+		var p2 = world.CreateBody(bodyDef);
+        p2.CreateFixture(fd1);
+		p2.SetAngle(Math.PI);
+		
+        update5();
+
+        function update5()
+        {
+            world.Step(1 / 60, 10, 10);
+			world.SetContactListener(listener);
+            world.DrawDebugData();
+            world.ClearForces();
+			if(shouldmove==1)
+			{
+				wheel.SetPosition(newpo);
+				wheel.SetLinearVelocity(vel);
+				shouldmove=0;
+			}
+			if(pcreate>0)
+			{
+			redportal.draw();
+			blueportal.draw();
+			}
+			if (circle == 1)
+            {
+                ctx.fillStyle = "rgba(255,255,255,0.1)";
+                ctx.beginPath();
+                ctx.arc(wheel.GetPosition().x * scale, wheel.GetPosition().y * scale, 4 * scale, 0, Math.PI * 2, false);
+                ctx.closePath();
+                ctx.fill();
+            }
+			ctx.fillStyle = 'rgba(145,145,255,0.5)';
+            ctx.beginPath();
+            ctx.arc(winx4, winy4, 30 * (xlimit + ylimit) / (1200 + 900), 0, Math.PI * 2, false);
+            ctx.closePath();
+            ctx.fill();
+            if (scope == 1)
+                ray();
+			if (Math.sqrt(Math.pow(wheel.GetPosition().x * scale - winx4, 2) + Math.pow(wheel.GetPosition().y * scale - winy4, 2)) > 50)
+            {
+                var frame5 = window.requestAnimationFrame(update5);
+            }
+            else
+            {
+				wheel.SetLinearVelocity(zero);
+				wheel.SetAngularVelocity(0);
+				pcreate=0;
                 console.log("Done");
                 level1();
             }
@@ -1899,8 +2227,8 @@
 		blueportal.y=100;
 		redportal.color='rgba(215, 44, 44, 0.6)';
 		blueportal.color='rgba(54, 161, 255, 0.6)';
-        level4();
+        level1();
     }
 </script>
 
-</html>v
+</html>
