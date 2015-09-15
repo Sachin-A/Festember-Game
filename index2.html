@@ -1,571 +1,365 @@
-<!DOCTYPE html>
-
-<html lang="en">
-
-    <head>
-        <meta charset="utf-8" />
-        <title>Portal</title>
-        <script type="text/javascript" src="Box2D.js"></script>
-        <style>
-            html,
-            body {
-                width: 100%;
-                height: 100%;
-                margin: 0px;
-                border: 0;
-                overflow: hidden;
-                display: block;
-            }
-        </style>
-    </head>
-
-    <body onresize="resize_canvas()" onkeydown="downkeyhandler(event)" onkeyup="upkeyhandler(event)">
-        <canvas id="canvas" style="background-color:#175AB8"></canvas>
-    </body>
-    <script>
-        var b2Vec2 = Box2D.Common.Math.b2Vec2,
-            b2BodyDef = Box2D.Dynamics.b2BodyDef,
-            b2Body = Box2D.Dynamics.b2Body,
-            b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
-            b2World = Box2D.Dynamics.b2World,
-            b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape,
-            b2CircleShape = Box2D.Collision.Shapes.b2CircleShape,
-            b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef,
-            b2MouseJointDef = Box2D.Dynamics.Joints.b2MouseJointDef,
-            b2DebugDraw = Box2D.Dynamics.b2DebugDraw,
-            b2Fixture = Box2D.Dynamics.b2Fixture,
-            b2RayCastInput = Box2D.Collision.b2RayCastInput,
-            b2RayCastOutput = Box2D.Collision.b2RayCastOutput,
-            b2AABB = Box2D.Collision.b2AABB;
-
-
-        var world = new b2World(new b2Vec2(0, 10), true);
-        var attract = new b2Vec2(0, 100);
-        var attached = 0;
-        var currentRayAngle = 0;
-        var input = new b2RayCastInput();
-        var output = new b2RayCastOutput();
-        var b = new b2BodyDef();
-        var f = new b2FixtureDef();
-        var closestFraction = 1;
-        var intersectionNormal = new b2Vec2(0, 0);
-        var intersectionPoint = new b2Vec2();
-        rayLength = 25; //long enough to hit the walls
-        var p2 = new b2Vec2();
-        var normalEnd = new b2Vec2();
-        var scope = 0;
-
-        var canvas = document.getElementById('canvas');
-        var ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        function resize_canvas()
+function level3()
+    {
+		
+        for (b = world.GetBodyList(); b; b = b.GetNext())
         {
-            canvas = document.getElementById("canvas");
-            if(canvas.width < window.innerWidth)
+            if (b != wheel)
+                world.DestroyBody(b);
+        }
+		var start3=new b2Vec2(4*xlimit/1200,25*ylimit/900);
+		wheel.SetPosition(start3);
+		console.log("Inside level3");
+		
+		var mag1=0;
+		var mag2=0;
+		var mag3=0;
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(-1 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
+        var border1 = world.CreateBody(bodyDef);
+        border1.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) - (31 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(20 * xlimit / 1200, 1* ylimit / 900);
+        var border2 = world.CreateBody(bodyDef);
+        border2.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(41 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
+        var border3 = world.CreateBody(bodyDef);
+        border3.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) + (9 * ylimit / 900));
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(20 * xlimit / 1200, 1 * ylimit / 900);
+        var border4 = world.CreateBody(bodyDef);
+        border4.CreateFixture(fd);
+		
+        // Ground 1
+        var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(5 * xlimit / 1200, (ylimit / scale) - (1 * ylimit / 900));
+		bodyDef.userData='ground';
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(5 * xlimit / 1200, 1 * ylimit / 900);
+        var ground1 = world.CreateBody(bodyDef);
+        ground1.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(5 * xlimit / 1200, (ylimit / scale) - (2.1 * ylimit / 900));
+		bodyDef.userData='portal';
+        var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        fd1.isSensor = true;
+		var p1 = world.CreateBody(bodyDef);
+        p1.CreateFixture(fd1);
+
+        // Ground 2
+        var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set((xlimit / scale) - (9 * xlimit / 1200), (ylimit / scale) - (1 * ylimit / 900));
+		bodyDef.userData='ground';
+        var fd = new b2FixtureDef;
+        fd.shape = new b2PolygonShape;
+        fd.shape.SetAsBox(5 * xlimit / 1200, 1 * ylimit / 900);
+        var ground2 = world.CreateBody(bodyDef);
+        ground2.CreateFixture(fd);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set((xlimit / scale) - (9 * xlimit / 1200), (ylimit / scale) - (2.1 * ylimit / 900));
+		bodyDef.userData='portal';
+        var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        fd1.isSensor = true;
+		var p2 = world.CreateBody(bodyDef);
+        p2.CreateFixture(fd1);
+
+        // First floor
+        var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(17 * xlimit / 1200, (ylimit / scale) - (11 * ylimit / 900));
+		bodyDef.userData='carrier';
+        var floor = new b2FixtureDef;
+        floor.shape = new b2PolygonShape();
+        floor.shape.SetAsOrientedBox(17 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        var firstfloor = world.CreateBody(bodyDef);
+        firstfloor.CreateFixture(floor);
+
+        //c1b1
+        var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (9 * ylimit / 900));
+		bodyDef.userData='cbox';
+        var box1 = new b2FixtureDef;
+        box1.shape = new b2PolygonShape();
+        box1.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
+		var c1b1 = world.CreateBody(bodyDef);
+        c1b1.CreateFixture(box1);
+			
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+		bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (9 * ylimit / 900));
+		bodyDef.userData='conveyor';
+		var fixDef2 = new b2FixtureDef;
+        fixDef2.shape = new b2CircleShape(5);
+        fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
+        fixDef2.density = 0;
+        fixDef2.isSensor = true;
+        var CC1 = world.CreateBody(bodyDef);
+        CC1.CreateFixture(fixDef2);
+        
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (7.9 * ylimit / 900));
+		bodyDef.userData='portal';
+		var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        fd1.isSensor = true;
+		var p3= world.CreateBody(bodyDef);
+		p3.CreateFixture(fd1);
+
+        //lift
+        var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set((xlimit / scale) - (0.5 * xlimit / 1200), (ylimit / scale) - (12 * ylimit / 900));
+		bodyDef.userData='carrier';
+        var f = new b2FixtureDef;
+        f.shape = new b2PolygonShape();
+        f.shape.SetAsOrientedBox(0.5 * xlimit / 1200, 12 * ylimit / 900, new b2Vec2(0, 0), 0);
+        var lift = world.CreateBody(bodyDef);
+        lift.CreateFixture(f);
+		
+        var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (2 * ylimit / 900));
+		bodyDef.userData='cbox';
+        var b1 = new b2FixtureDef;
+        b1.shape = new b2PolygonShape();
+        b1.shape.SetAsOrientedBox(2 * ylimit / 900, 0.5 * xlimit / 1200, new b2Vec2(0, 0), (Math.PI/2));
+        var c2b1 = world.CreateBody(bodyDef);
+        c2b1.CreateFixture(b1);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+		bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (2 * ylimit / 900));
+		bodyDef.userData='conveyor';
+		var fixDef2 = new b2FixtureDef;
+        fixDef2.shape = new b2CircleShape(5);
+        fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
+        fixDef2.density = 0;
+        fixDef2.isSensor = true;
+        var CC2 = world.CreateBody(bodyDef);
+        CC2.CreateFixture(fixDef2);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set((xlimit / scale) - (2.1 * xlimit / 1200), (ylimit / scale) - (2 * ylimit / 900));
+		bodyDef.userData='portal';
+		var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(1 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), (Math.PI)/2);
+        fd1.isSensor = true;
+		var p4= world.CreateBody(bodyDef);
+		p4.CreateFixture(fd1);
+
+        // intermediate floor
+        var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(18 * xlimit / 1200, (ylimit / scale) - (16 * ylimit / 900));
+		bodyDef.userData='ground';
+        var floor = new b2FixtureDef;
+        floor.shape = new b2PolygonShape();
+        floor.shape.SetAsOrientedBox(18 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        var Ifloor = world.CreateBody(bodyDef);
+        Ifloor.CreateFixture(floor);
+
+        // Second floor
+        var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(22 * xlimit / 1200, (ylimit / scale) - (29 * ylimit / 900));
+		bodyDef.userData='carrier';
+        var floor2 = new b2FixtureDef;
+        floor2.shape = new b2PolygonShape();
+        floor2.shape.SetAsOrientedBox(18 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        var floor2 = world.CreateBody(bodyDef);
+        floor2.CreateFixture(floor);
+        
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(7 * xlimit / 1200, (ylimit / scale) - (27 * ylimit / 900));
+		bodyDef.userData='cbox';
+        var bx1 = new b2FixtureDef;
+        bx1.shape = new b2PolygonShape();
+        bx1.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        var c3b1 = world.CreateBody(bodyDef);
+        c3b1.CreateFixture(bx1);
+		
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+		bodyDef.position.Set(7 * xlimit / 1200, (ylimit / scale) - (27 * ylimit / 900));
+		bodyDef.userData='conveyor';
+		var fixDef2 = new b2FixtureDef;
+        fixDef2.shape = new b2CircleShape(6);
+        fixDef2.shape.SetLocalPosition(new b2Vec2(0, 0));
+        fixDef2.density = 0;
+        fixDef2.isSensor = true;
+        var CC3 = world.CreateBody(bodyDef);
+        CC3.CreateFixture(fixDef2);
+        
+		var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        bodyDef.position.Set(7 * xlimit / 1200, (ylimit / scale) - (25.9 * ylimit / 900));
+		bodyDef.userData='portal';
+		var fd1 = new b2FixtureDef;
+        fd1.shape = new b2PolygonShape;
+        fd1.shape.SetAsOrientedBox(1.5 * xlimit / 1200, 0.1 * ylimit / 900, new b2Vec2(0, 0), 0);
+        fd1.isSensor = true;
+		var p5= world.CreateBody(bodyDef);
+		p5.CreateFixture(fd1);
+		
+		
+		function conveyor_motion()
+        {
+            var b = new b2BodyDef();
+            for (b = world.GetBodyList(); b; b = b.GetNext())
             {
-                canvas.width = window.innerWidth;
-            }
-            if(canvas.height < window.innerHeight)
-            {
-                canvas.height = window.innerHeight;
+                if (b == c1b1 || b == p3 || b == CC1)
+                {
+                    if (b.GetPosition().x >= 31 * xlimit / 1200)
+                        mag1=-0.1;
+					if(b.GetPosition().x <= 3 * xlimit / 1200)
+						mag1=0.1;
+                    var movex = b.GetPosition().x + (mag1 * xlimit / 1200);
+                    var movey = b.GetPosition().y;
+                    var move = new b2Vec2(movex, movey);
+                    b.SetPosition(move);
+                }
+				if (b == c2b1 || b == p4 || b == CC2)
+                {
+                    if (b.GetPosition().y >= 27 * ylimit / 900)
+                        mag2=-0.2;
+					if (b.GetPosition().y <= 8 * ylimit / 900)
+						mag2=0.2;
+                    var movey = b.GetPosition().y + (mag2 * ylimit / 900);
+                    var movex = b.GetPosition().x;
+                    var move = new b2Vec2(movex, movey);
+                    b.SetPosition(move);
+                }
+				if (b == c3b1 || b == p5 || b == CC3)
+                {
+                    if (b.GetPosition().x >= 37 * xlimit / 1200)
+                        mag3=-0.1;
+					if(b.GetPosition().x <= 7 * xlimit / 1200)
+						mag3=0.1;
+                    var movex = b.GetPosition().x + (mag3 * xlimit / 1200);
+                    var movey = b.GetPosition().y;
+                    var move = new b2Vec2(movex, movey);
+                    b.SetPosition(move);
+                }
             }
         }
-        var ylimit = canvas.height;
-        var xlimit = canvas.width;
-        var xylimit = ylimit * xlimit;
-        var scale = 30;
-		var current=0;
-				
 
-            //circle
-
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_dynamicBody;
-            bodyDef.position.Set(4 * xlimit / 1200, 25 * ylimit / 900);
-            bodyDef.userData = 'obj';
-
-            var fixDef = new b2FixtureDef;
-            fixDef.density = 10.0;
-            fixDef.friction = .9;
-            fixDef.restitution = .5;
-            fixDef.shape = new b2CircleShape(1 * (xlimit + ylimit) / (1200 + 900));
-
-            var wheel = world.CreateBody(bodyDef);
-            wheel.CreateFixture(fixDef);
-            var p1 = wheel.GetPosition(); //center of scene
-
-            //Setting angular velocity to  360 degrees per second and Setting initial position to  x = 2 and y = 3 and Initial Angle to 20 degrees anticlockwise
-            //wheel.SetAngularVelocity(Math.PI * 2);
-            //wheel.SetPositionAndAngle(new b2Vec2(2, 3), -20 * (Math.PI / 180));
-		
-		
-		/*function level1()
-		{*/
-
-            // Ground 1
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set(5 * xlimit / 1200, (ylimit / scale) - (1 * ylimit / 900));
-
-            var fd = new b2FixtureDef;
-            fd.shape = new b2PolygonShape;
-            fd.shape.SetAsBox(5 * xlimit / 1200, 1 * ylimit / 900);
-
-            var ground1 = world.CreateBody(bodyDef);
-            ground1.CreateFixture(fd);
-
-            // Ground 2
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set((xlimit / scale) - (8 * xlimit / 1200), (ylimit / scale) - (1 * ylimit / 900));
-
-            var fd = new b2FixtureDef;
-            fd.shape = new b2PolygonShape;
-            fd.shape.SetAsBox(5 * xlimit / 1200, 1 * ylimit / 900);
-
-            var ground2 = world.CreateBody(bodyDef);
-            ground2.CreateFixture(fd);
-
-            // First floor
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set(18 * xlimit / 1200, (ylimit / scale) - (12 * ylimit / 900));
-
-            var floor = new b2FixtureDef;
-            floor.shape = new b2PolygonShape();
-            floor.shape.SetAsOrientedBox(18 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
-
-            var firstfloor = world.CreateBody(bodyDef);
-            firstfloor.CreateFixture(floor);
-
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set(3 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
-
-            var box1 = new b2FixtureDef;
-            box1.shape = new b2PolygonShape();
-            box1.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
-
-            var c1b1 = world.CreateBody(bodyDef);
-            c1b1.CreateFixture(box1);
-
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set(15 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
-
-            var box2 = new b2FixtureDef;
-            box2.shape = new b2PolygonShape();
-            box2.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
-
-            var c1b2 = world.CreateBody(bodyDef);
-            c1b2.CreateFixture(box2);
-
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set(27 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
-
-            var box3 = new b2FixtureDef;
-            box3.shape = new b2PolygonShape();
-            box3.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
-
-            var c1b3 = world.CreateBody(bodyDef);
-            c1b3.CreateFixture(box3);
-
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set((xlimit / scale) - (0.5 * xlimit / 1200), (ylimit / scale) - (12 * ylimit / 900));
-
-            var f = new b2FixtureDef;
-            f.shape = new b2PolygonShape();
-            f.shape.SetAsOrientedBox(0.5 * xlimit / 1200, 12 * ylimit / 900, new b2Vec2(0, 0), 0);
-
-            var lift = world.CreateBody(bodyDef);
-            lift.CreateFixture(f);
-
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (2 * ylimit / 900));
-
-            var b1 = new b2FixtureDef;
-            b1.shape = new b2PolygonShape();
-            b1.shape.SetAsOrientedBox(0.5 * xlimit / 1200, 2 * ylimit / 900, new b2Vec2(0, 0), 0);
-
-            var c2b1 = world.CreateBody(bodyDef);
-            c2b1.CreateFixture(b1);
-
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (10 * ylimit / 900));
-
-            var b2 = new b2FixtureDef;
-            b2.shape = new b2PolygonShape();
-            b2.shape.SetAsOrientedBox(0.5 * xlimit / 1200, 2 * ylimit / 900, new b2Vec2(0, 0), 0);
-
-            var c2b2 = world.CreateBody(bodyDef);
-            c2b2.CreateFixture(b2);
-
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set((xlimit / scale) - (1.5 * xlimit / 1200), (ylimit / scale) - (18 * ylimit / 900));
-
-            var b3 = new b2FixtureDef;
-            b3.shape = new b2PolygonShape();
-            b3.shape.SetAsOrientedBox(0.5 * xlimit / 1200, 2 * ylimit / 900, new b2Vec2(0, 0), 0);
-
-            var c2b3 = world.CreateBody(bodyDef);
-            c2b3.CreateFixture(b3);
-
-            // Second floor
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set(22 * xlimit / 1200, (ylimit / scale) - (28 * ylimit / 900));
-
-            var floor2 = new b2FixtureDef;
-            floor2.shape = new b2PolygonShape();
-            floor2.shape.SetAsOrientedBox(18 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
-
-            var floor2 = world.CreateBody(bodyDef);
-            floor2.CreateFixture(floor);
-
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set(13 * xlimit / 1200, (ylimit / scale) - (26 * ylimit / 900));
-
-            var bx1 = new b2FixtureDef;
-            bx1.shape = new b2PolygonShape();
-            bx1.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
-
-            var c3b1 = world.CreateBody(bodyDef);
-            c3b1.CreateFixture(bx1);
-
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set(25 * xlimit / 1200, (ylimit / scale) - (26 * ylimit / 900));
-
-            var bx2 = new b2FixtureDef;
-            bx2.shape = new b2PolygonShape();
-            bx2.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
-
-            var c3b2 = world.CreateBody(bodyDef);
-            c3b2.CreateFixture(bx2);
-
-            var bodyDef = new b2BodyDef;
-            bodyDef.type = b2Body.b2_staticBody;
-            bodyDef.position.Set(37 * xlimit / 1200, (ylimit / scale) - (26 * ylimit / 900));
-
-            var bx3 = new b2FixtureDef;
-            bx3.shape = new b2PolygonShape();
-            bx3.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
-
-            var c3b3 = world.CreateBody(bodyDef);
-            c3b3.CreateFixture(bx3);			
-
-
-            function conveyor_motion()
+        function attach()
+        {
+			for (i = 0; i < pull.length; i++)
             {
-                var b = new b2BodyDef();
-                for(b = world.GetBodyList(); b; b = b.GetNext())
-                {
-                    if(b == c1b1 || b == c1b2 || b == c1b3)
-                    {
-                        //console.log(b.GetPosition());
-                        var back1 = new b2Vec2(-3 * xlimit / 1200, b.GetPosition().y);
-                        if(b.GetPosition().x >= 33 * xlimit / 1200)
-                            b.SetPosition(back1);
-                        var movex = b.GetPosition().x + (0.05 * xlimit / 1200);
-                        var movey = b.GetPosition().y;
-                        var move = new b2Vec2(movex, movey);
-                        b.SetPosition(move);
-                        //wheel.SetLinearVelocity(move);
-                    }
-                    if(b == c2b1 || b == c2b2 || b == c2b3)
-                    {
-                        //console.log(b.GetPosition());
-                        var back2 = new b2Vec2(b.GetPosition().x, 32 * ylimit / 900);
-                        if(b.GetPosition().y <= 8 * ylimit / 900)
-                            b.SetPosition(back2);
-                        var movex = b.GetPosition().x;
-                        var movey = b.GetPosition().y - (0.2 * ylimit / 900);
-                        var move = new b2Vec2(movex, movey);
-                        b.SetPosition(move);
-                        //wheel.SetLinearVelocity(move);
-                    }
-                    if(b == c3b1 || b == c3b2 || b == c3b3)
-                    {
-                        //console.log(b.GetPosition());
-                        var back3 = new b2Vec2(43 * xlimit / 1200, b.GetPosition().y);
-                        if(b.GetPosition().x <= 7 * xlimit / 1200)
-                            b.SetPosition(back3);
-                        var movex = b.GetPosition().x - (0.3 * xlimit / 1200);
-                        var movey = b.GetPosition().y;
-                        var move = new b2Vec2(movex, movey);
-                        b.SetPosition(move);
-                        //wheel.SetLinearVelocity(move);
-                    }
-                }
+                var c1 = wheel.GetWorldCenter();
+                var c2 = pull[i].GetWorldCenter();
+                var vecnew = new b2Vec2();
+                vecnew.x = c2.x - c1.x;
+                vecnew.y = c2.y - c1.y;
+                var magnew = Math.sqrt(((vecnew.x * vecnew.x) + (vecnew.y * vecnew.y)));
+                vecnew.x = vecnew.x / magnew;
+                vecnew.y = vecnew.y / magnew;
+                var force = new b2Vec2();
+                force.x = 1500 * vecnew.x;
+                force.y = 2500 * vecnew.y;
+                wheel.ApplyForce(force, wheel.GetWorldCenter());
+                wheel.SetAngularDamping(10);
             }
+        }
 
-            function attach()
-            {
-                for(b = world.GetBodyList(); b; b = b.GetNext())
-                {
-                    if(b == c1b1 || b == c1b2 || b == c1b3 && (attached != 2 || attached != 3))
-                    {
-                        console.log("A");
-                        if(Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 15 * xlimit / 1200)
-                        {
-                            var set = new b2Vec2(b.GetPosition().x, b.GetPosition().y + 2);
-                            console.log("B");
-                            wheel.SetPosition(set);
-                            //wheel.ApplyForce(new b2Vec2(0,-10),wheel.GetPosition());
-                            wheel.ApplyForce(b.GetPosition(), wheel.GetPosition());
-                            //console.log(wheel.GetPosition());
-                            attached = 1;
-                        }
-                    }
-                    if(b == c2b1 || b == c2b2 || b == c2b3 && (attached != 1 && attached != 3))
-                    {
-                        console.log("A");
-                        if(Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 15)
-                        {
-                            var set = new b2Vec2(b.GetPosition().x - 1, b.GetPosition().y);
-                            console.log("B");
-                            //wheel.SetPosition(set);
-                            wheel.ApplyForce(b.GetPosition(), wheel.GetPosition());
-                            console.log(wheel.GetPosition());
-                            attached = 2;
-                        }
-                    }
-                    if(b == c3b1 || b == c3b2 || b == c3b3 && (attached != 1 && attached != 2))
-                    {
-                        console.log("A");
-                        if(Math.sqrt(Math.pow(wheel.GetPosition().x - b.GetPosition().x, 2) + Math.pow(wheel.GetPosition().y - b.GetPosition().y, 2)) <= 15)
-                        {
-                            var set = new b2Vec2(b.GetPosition().x, b.GetPosition().y + 2);
-                            console.log("B");
-                            wheel.SetPosition(set);
-                            console.log(wheel.GetPosition());
-                            attached = 3;
-                        }
-                    }
-                }
-            }
+        update3();
 
-            function ray()
-            {
+        function update3()
+        {
 
-                var k = 360 / 5;
-                var t = k / 60;
-                var DEGTORAD = Math.PI / 180;
-                currentRayAngle += t * DEGTORAD; //one revolution every 20 seconds
-
-                //calculate points of ray
-                p2.x = p1.x + rayLength * Math.sin(currentRayAngle);
-                p2.y = p1.y + rayLength * Math.cos(currentRayAngle);
-
-                input.p1 = p1;
-                input.p2 = p2;
-                input.maxFraction = 1;
-                closestFraction = 1;
-
-                var b = new b2BodyDef();
-                var f = new b2FixtureDef();
-
-                for(b = world.GetBodyList(); b; b = b.GetNext())
-                {
-                    for(f = b.GetFixtureList(); f; f = f.GetNext())
-                    {
-                        if(!f.RayCast(output, input))
-                            continue;
-                        else if(output.fraction < closestFraction)
-                        {
-                            closestFraction = output.fraction;
-                            intersectionNormal = output.normal;
-                        }
-                    }
-
-                }
-                intersectionPoint.x = p1.x + closestFraction * (p2.x - p1.x);
-                intersectionPoint.y = p1.y + closestFraction * (p2.y - p1.y);
-
-                normalEnd.x = intersectionPoint.x + intersectionNormal.x;
-                normalEnd.y = intersectionPoint.y + intersectionNormal.y;
-
-                ctx.strokeStyle = "rgba(255, 255, 255, 1)";
-                ctx.lineWidth = 25;
-                ctx.bordercolor = 'red';
-                ctx.borderwidth = 10;
-
-                ctx.beginPath(); // Start the path
-                ctx.moveTo(p1.x * 30, p1.y * 30); // Set the path origin
-                ctx.lineTo(intersectionPoint.x * 30, intersectionPoint.y * 30); // Set the path destination
-                ctx.closePath(); // Close the path
-                ctx.stroke();
-                ctx.lineWidth = 1;
-				if(portalsystem.redportal.exist==0)
-				{
-					portalsystem.redportal.x=intersectionPoint.x * 30;
-					portalsystem.redportal.y=intersectionPoint.y * 30;
-				}
-				if(portalsystem.blueportal.exist==0)
-				{
-					portalsystem.blueportal.x=wheel.GetPosition().x;
-					portalsystem.blueportal.y=wheel.GetPosition().y;
-				}
-            }
-			
-
-
-            var debugDraw = new b2DebugDraw();
-            debugDraw.SetSprite(document.getElementById("canvas").getContext("2d"));
-            debugDraw.SetDrawScale(30); //define scale
-            debugDraw.SetFillAlpha(1); //define transparency
-            debugDraw.SetLineThickness(1);
-            debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
-            //debugDraw.SetFlags(b2DebugDraw.e_shapeBit);
-            world.SetDebugDraw(debugDraw);
-		//}
-		
-			function update()
-            {
-                world.Step(1 / 60, 10, 10);
-                if(attached == 1)
-                    wheel.ApplyForce(new b2Vec2(0 * wheel.GetMass(), -10 * wheel.GetMass()), wheel.GetPosition());
-                world.DrawDebugData();
-                world.ClearForces();
-                conveyor_motion();
-				portals();
-				if(portalsystem.redportal.exist==1||portalsystem.blueportal.exist==1)
-				portalsystem.draw();
-				if(portalsystem.redportal.exist==1&&portalsystem.blueportal.exist==1)
-				portalsystem.draw();
-                if(scope == 1)
-                    ray();
-                /*if(wheel.GetPosition() == win)
-                {
-                    cancelAnimationFrame(frame);
-                }*/
-                var frame = window.requestAnimationFrame(update);
-            };
-		
-			var portalsystem=
+            world.Step(1 / 60, 10, 10);
+            world.DrawDebugData();
+            world.ClearForces();
+            world.SetContactListener(listener);
+            //fpsa.innerHTML = fps.getFPS();
+            conveyor_motion();
+			active();
+			if(count==1)
 			{
-				radius:25,
-				blueportal:{},
-				redportal:{},
-				draw :function()
-				{
-					ctx.fillStyle = this.redportal.color;
-					ctx.beginPath();
-					ctx.arc(this.redportal.x,this.redportal.y,this.radius, 0, Math.PI * 2, false);
-					ctx.closePath();
-					ctx.fill();
-					ctx.fillStyle = this.blueportal.color;
-					ctx.beginPath();
-					ctx.arc(this.blueportal.x,this.blueportal.y,this.radius, 0, Math.PI * 2, false);
-					ctx.closePath();
-					ctx.fill();
-				}
-			};
-			
-			function portals()
-			{
-				if(Math.sqrt(Math.pow(wheel.GetPosition().x - portalsystem.blueportal.x, 2) + Math.pow(wheel.GetPosition().y - portalsystem.blueportal.y, 2)) <= 15 * xlimit / 1200 && current==0)
-				{
-					//alert("Blue");
-					wheel.GetPosition().x=portalsystem.redportal.x;
-					wheel.GetPosition().y=portalsystem.redportal.y;
-					current=1;
-				}
-				else if(Math.sqrt(Math.pow(wheel.GetPosition().x - portalsystem.redportal.x, 2) + Math.pow(wheel.GetPosition().y - portalsystem.redportal.y, 2)) <= 15 * xlimit / 1200 && current==0)
-				{
-					//alert("Red");
-					wheel.GetPosition().x=portalsystem.blueportal.x;
-					wheel.GetPosition().y=portalsystem.blueportal.y;
-					current=1;
-				}
-				else if(wheel.GetPosition().x!=portalsystem.blueportal.x && wheel.GetPosition().y!=portalsystem.blueportal.y && wheel.GetPosition().x!=portalsystem.redportal.x && wheel.GetPosition().y!=portalsystem.redportal.y)current=0;
+				attach();
 			}
-		
-			function downkeyhandler(event)
-            {
-                var keycode = event.which;
-                //console.log("We're in down");
-                switch(keycode)
-                {
-                    case 32: //console.log("We're in key");
-                        attach();
-                        break;
-                    case 37:
-                        var mass = wheel.GetMass() * 10;
-                        wheel.ApplyImpulse(new b2Vec2(-mass, 0), wheel.GetPosition());
-                        break;
-                    case 38:
-                        var mass = wheel.GetMass() * 10;
-                        wheel.ApplyImpulse(new b2Vec2(0, -mass), wheel.GetPosition());
-                        break;
-                    case 39:
-                        var mass = wheel.GetMass() * 10;
-                        wheel.ApplyImpulse(new b2Vec2(mass, 0), wheel.GetPosition());
-                        break;
-                    case 40:
-                        var mass = wheel.GetMass() * 10;
-                        wheel.ApplyImpulse(new b2Vec2(0, mass), wheel.GetPosition());
-                        break;
-                    case 80:
-                        scope = 1;
-					case 82:if(portalsystem.redportal.exist==0)
-							{
-								portalsystem.redportal.exist=1;
-								portalsystem.draw();
-							}
-							break;
-					case 66:if(portalsystem.blueportal.exist==0)
-							{
-								portalsystem.blueportal.exist=1;
-								portalsystem.draw();
-							}
-							break;
-                    default:
-                        break;
-                }
-            }
-
-            function upkeyhandler(event)
-            {
-                var keycode = event.which;
-                switch(keycode)
-                {
-                    case 32: //console.log("We're in key");
-                        attached = 0;
-                        break;
-                    case 80:
-                        scope = 0;
-                        /*case 37:var mass=wheel.GetMass()*100;
-                        		wheel.ApplyForce(new b2Vec2(-mass,0),wheel.GetPosition());
-                        		break;
-                        case 39:var mass=wheel.GetMass()*100;
-                        		wheel.ApplyForce(new b2Vec2(mass,0),wheel.GetPosition());
-                        		break;*/
-                    default:
-                        break;
-                }
-            }
-			
-			window.onload= function()
+			if(shouldmove==1)
 			{
-				portalsystem.redportal.x=-10;
-				portalsystem.redportal.y=-10;
-				portalsystem.blueportal.x=canvas.width-40;
-				portalsystem.blueportal.y=canvas.height-40;
-				portalsystem.redportal.exist=0;
-				portalsystem.blueportal.exist=0;
-				portalsystem.redportal.color='Crimson';
-				portalsystem.blueportal.color='rgba(54, 161, 255, 0.8)';
-				frame = window.requestAnimationFrame(update);
+				wheel.SetPosition(newpo);
+				wheel.SetLinearVelocity(vel);
+				shouldmove=0;
 			}
-    </script>
-
-</html>
+			if(bset>0)
+			{
+				console.log("blue");
+				blueportal.draw();
+			}
+			if(rset>0)
+			{
+				console.log("red");
+				redportal.draw();
+			}
+            if (circle == 1)
+            {
+                ctx.fillStyle = "rgba(255,255,255,0.1)";
+                ctx.beginPath();
+                ctx.arc(wheel.GetPosition().x * scale, wheel.GetPosition().y * scale, 4 * scale, 0, Math.PI * 2, false);
+                ctx.closePath();
+                ctx.fill();
+            }
+            if (scope == 1)
+            {
+                ray();
+            }
+            ctx.fillStyle = 'rgba(145,145,255,0.5)';
+            ctx.beginPath();
+            ctx.arc(winx, winy, 15 * (xlimit + ylimit) / (1200 + 900), 0, Math.PI * 2, false);
+            ctx.closePath();
+            ctx.fill();
+            if (Math.sqrt(Math.pow(wheel.GetPosition().x * scale - winx, 2) + Math.pow(wheel.GetPosition().y * scale - winy, 2)) > 50)
+            {
+                var frame3 = window.requestAnimationFrame(update3);
+            }
+            else
+            {
+				wheel.SetLinearVelocity(zero);
+				wheel.SetAngularVelocity(0);
+				rset=0;
+				bset=0;
+                level4();
+            }
+        }
+    }
