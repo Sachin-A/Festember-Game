@@ -1,8 +1,16 @@
 function level4()
     {
+		time=120000;
+		levelnumber=4;
+		$("#single2").html("<p>Level: " +levelnumber + "</p>");
+		$("#time").html("Time left: " +time);
+		$("#lives").html("Time left: " +lives);
+		
+		var currentCountDown = createCountDown(time); 
+		
         for (b = world.GetBodyList(); b; b = b.GetNext())
         {
-            if (b != wheel)
+            if (b != wheel && b!=border1 && b!=border2 && b!=border3 && b!=border4)
                 world.DestroyBody(b);
         }
 		
@@ -11,49 +19,11 @@ function level4()
 		
 		var start4=new b2Vec2(5*xlimit/1200,10*ylimit/900);
 		wheel.SetPosition(start4);
-        
-		console.log("Fourth level");
 		
-		var bodyDef = new b2BodyDef;
-        bodyDef.type = b2Body.b2_staticBody;
-        bodyDef.position.Set(-1 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
-        var fd = new b2FixtureDef;
-        fd.shape = new b2PolygonShape;
-        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
-        var border1 = world.CreateBody(bodyDef);
-        border1.CreateFixture(fd);
-		
-		var bodyDef = new b2BodyDef;
-        bodyDef.type = b2Body.b2_staticBody;
-        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) - (31 * ylimit / 900));
-        var fd = new b2FixtureDef;
-        fd.shape = new b2PolygonShape;
-        fd.shape.SetAsBox(20 * xlimit / 1200, 1* ylimit / 900);
-        var border2 = world.CreateBody(bodyDef);
-        border2.CreateFixture(fd);
-		
-		var bodyDef = new b2BodyDef;
-        bodyDef.type = b2Body.b2_staticBody;
-        bodyDef.position.Set(41 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
-        var fd = new b2FixtureDef;
-        fd.shape = new b2PolygonShape;
-        fd.shape.SetAsBox(1 * xlimit / 1200, 20 * ylimit / 900);
-        var border3 = world.CreateBody(bodyDef);
-        border3.CreateFixture(fd);
-		
-		var bodyDef = new b2BodyDef;
-        bodyDef.type = b2Body.b2_staticBody;
-        bodyDef.position.Set(20 * xlimit / 1200, (ylimit / scale) + (9 * ylimit / 900));
-        var fd = new b2FixtureDef;
-        fd.shape = new b2PolygonShape;
-        fd.shape.SetAsBox(20 * xlimit / 1200, 1 * ylimit / 900);
-        var border4 = world.CreateBody(bodyDef);
-        border4.CreateFixture(fd);
-		
-        
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(5 * xlimit / 1200, (ylimit / scale) - (1 * ylimit / 900));
+		bodyDef.userData='ground';
         var fd = new b2FixtureDef;
         fd.shape = new b2PolygonShape;
         fd.shape.SetAsBox(5 * xlimit / 1200, 1 * ylimit / 900);
@@ -74,6 +44,7 @@ function level4()
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(35 * xlimit / 1200, (ylimit / scale) - (25 * ylimit / 900));
+		bodyDef.userData='ground';
         var fd = new b2FixtureDef;
         fd.shape = new b2PolygonShape;
         fd.shape.SetAsOrientedBox(5 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
@@ -94,11 +65,13 @@ function level4()
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(35 * xlimit / 1200, (ylimit / scale) - (5 * ylimit / 900));
+		bodyDef.userData='ground';
         var fd = new b2FixtureDef;
         fd.shape = new b2PolygonShape;
-        fd.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 3.5*Math.PI/4);
+        fd.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
         var tilt = world.CreateBody(bodyDef);
         tilt.CreateFixture(fd);
+		tilt.SetAngle(3.5*Math.PI/4);
 		
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
@@ -106,14 +79,16 @@ function level4()
 		bodyDef.userData='bounce';
         var fd1 = new b2FixtureDef;
         fd1.shape = new b2PolygonShape;
-        fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 1.2 * ylimit / 900, new b2Vec2(0, 0), 3.5*Math.PI/4);
+        fd1.shape.SetAsOrientedBox(3 * xlimit / 1200, 1.2 * ylimit / 900, new b2Vec2(0, 0), 0);
         fd1.isSensor = true;
 		var bounce1 = world.CreateBody(bodyDef);
         bounce1.CreateFixture(fd1);
+		bounce1.SetAngle(3.5*Math.PI/4);
 		
 		var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(19 * xlimit / 1200, (ylimit / scale) - (21 * ylimit / 900));
+		bodyDef.userData='ground';
         var fd = new b2FixtureDef;
         fd.shape = new b2PolygonShape;
         fd.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
@@ -135,6 +110,7 @@ function level4()
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.Set(19 * xlimit / 1200, (ylimit / scale) - (10 * ylimit / 900));
+		bodyDef.userData='ground';
         var fd = new b2FixtureDef;
         fd.shape = new b2PolygonShape;
         fd.shape.SetAsOrientedBox(3 * xlimit / 1200, 1 * ylimit / 900, new b2Vec2(0, 0), 0);
@@ -145,11 +121,32 @@ function level4()
 
         function update4()
         {
+			var timeleftgame = currentCountDown();
+			var countDownValue = Math.floor(timeleftgame/1000);
+			$("#time").html("Time left: " +countDownValue);
+			if(countDownValue==0 && restart==false)
+			{
+				lives--;
+				restart=true;
+			}
+			$("#score").html("Score: " +Math.floor(timeleftgame/1000*lives));
+			$("#lives").html("Lives left: " +lives);
+			if(escape==false && end==false)
+			{
+			document.getElementById('bouncei').style.display='block';
+			document.getElementById('pause').style.display='none';
+			document.getElementById('instructions').style.display='none';
+			document.getElementById('canvas').style.backgroundColor='rgba(0, 0, 44, 0.8)';
             world.Step(1 / 60, 10, 10);
+			draw();
 			world.SetContactListener(listener);
-            world.DrawDebugData();
             world.ClearForces();
 			active();
+			if(died==true)
+				{
+					wheel.SetPosition(start4);
+					died=false;
+				}
 			if(shouldmove==1)
 			{
 				wheel.SetPosition(newpo);
@@ -161,21 +158,11 @@ function level4()
 				wheel.SetLinearVelocity(vspeed);
 				shouldbounce=0;
 			}
-			if(bset>0)
-			{
-				console.log("blue");
-				blueportal.draw();
-			}
-			if(rset>0)
-			{
-				console.log("red");
-				redportal.draw();
-			}
-			if (circle == 1)
+			if (count == 1)
             {
                 ctx.fillStyle = "rgba(255,255,255,0.1)";
                 ctx.beginPath();
-                ctx.arc(wheel.GetPosition().x * scale, wheel.GetPosition().y * scale, 4 * scale, 0, Math.PI * 2, false);
+                ctx.arc(wheel.GetPosition().x * scale, wheel.GetPosition().y * scale, 2 * scale, 0, Math.PI * 2, false);
                 ctx.closePath();
                 ctx.fill();
             }
@@ -186,17 +173,35 @@ function level4()
             ctx.fill();
             if (scope == 1)
                 ray();
-			if (Math.sqrt(Math.pow(wheel.GetPosition().x * scale - winx4, 2) + Math.pow(wheel.GetPosition().y * scale - winy4, 2)) > 50)
+			}
+			if(escape==true && instruc==false)
+			{
+				ctx.clearRect(0,0, canvas.width, canvas.height);
+				document.getElementById('canvas').style.backgroundColor='#3366FF';
+				document.getElementById('pause').style.display='block';
+				document.getElementById('bouncei').style.display='none';
+			}
+			if(escape==true && goback==true)
+			{
+				document.getElementById('pause').style.display='none';
+				ctx.clearRect(0,0, canvas.width, canvas.height);
+				end=true;
+				window.cancelAnimationFrame(frame1);
+				//level1();
+			}
+			if (Math.sqrt(Math.pow(wheel.GetPosition().x * scale - winx4, 2) + Math.pow(wheel.GetPosition().y * scale - winy4, 2)) > 50 && end==false)
             {
                 var frame4 = window.requestAnimationFrame(update4);
             }
-            else
+            if (Math.sqrt(Math.pow(wheel.GetPosition().x * scale - winx4, 2) + Math.pow(wheel.GetPosition().y * scale - winy4, 2)) < 50 && end==false)
             {
 				wheel.SetLinearVelocity(zero);
 				wheel.SetAngularVelocity(0);
 				rset=0;
 				bset=0;
-                level5();
+				count=0;
+				document.getElementById('bouncei').style.display='none';
+                level1();
             }
         };
     }
