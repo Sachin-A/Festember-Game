@@ -290,7 +290,7 @@
 		document.getElementById('time').style.display='block';
 		document.getElementById('canvas').style.display='block';
 		startvar=false;
-		level4();
+		level1();
 	}
 	
 	window.credits =function ()
