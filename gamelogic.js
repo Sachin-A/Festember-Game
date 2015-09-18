@@ -74,9 +74,47 @@
 	var highscore;
 	var time;
 	var lives=3;
+	var a=0;
 	
 	//music
-	var shoot = new Audio("shootportal.mp3"); // portal shooting sound
+	var blueshoot = new Audio("blueportalshoot.mp3"); //blue portal shooting sound
+	var redshoot = new Audio("redportalshoot.mp3"); //red portal shooting sound
+	var level = new Audio("Level.mp3")//level gameplay music
+	level.volume=0.5;
+	var warp = new Audio("warp.mp3")//portal warping music
+	var bouncesound = new Audio("bouncesound.mp3")//blue box bounce music
+	var menu = new Audio("menu.mp3")//level gameplay music
+	
+	//music functions
+	
+	function menusound()
+	{
+		menu.play();
+	}
+	
+	function playlevel(num)
+		{
+			if(num==1)
+			{
+				if (typeof level.loop == 'boolean')
+				{
+					level.loop = true;
+				}
+				else
+				{
+					level.addEventListener('ended', function() {
+						this.currentTime = 0;
+						this.play();
+					}, false);
+				}
+			}
+			/*else
+			{
+				level.loop = false;
+				level.pause();
+			}*/
+				
+		}
 	
 	var tempbody = new b2BodyDef();
 	tempbody.type = b2Body.b2_staticBody;
@@ -236,6 +274,7 @@
 		
 		instruc=false;
 		document.getElementById('instructions').style.display='none';
+		document.getElementById('showcredits').style.display='none';
 		if(startvar==true)
 		{
 			document.getElementById('startmenu').style.display='block';
@@ -251,7 +290,14 @@
 		document.getElementById('time').style.display='block';
 		document.getElementById('canvas').style.display='block';
 		startvar=false;
-		level1();
+		level4();
+	}
+	
+	window.credits =function ()
+	{
+		document.getElementById('pause').style.display='none';
+		document.getElementById('startmenu').style.display='none';
+		document.getElementById('showcredits').style.display='block';
 	}
 	
     //fps display
@@ -280,6 +326,7 @@
     {
 		if(current==0 && live==1)
 		{
+		warp.play();
 		relang=tempbody2.GetAngle()-tempbody.GetAngle()+Math.PI;
 		magx=wheel.GetLinearVelocity().x;
 		magy=wheel.GetLinearVelocity().y;
@@ -307,14 +354,14 @@
 			case 1:if(scope==1)
 					{		
 					if(bcreate==0)bcreate=1;
-					shoot.play();
+					if(escape==false)blueshoot.play();
 					}
 					break;
 			case 2:break;
 			case 3:if(scope==1)
 					{		
+					if(escape==false)redshoot.play();
 					if(rcreate==0)rcreate=1;
-					shoot.play();
 					}
 					break;
 			default:break;
@@ -489,8 +536,8 @@
 				  }
 				  else if(b==temp2)
 				  {
-					  ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
-				      ctx.fillStyle = "rgba(132, 45, 52, 1)";
+					  ctx.strokeStyle = "rgba(255, 0, 0, 1))";
+				      ctx.fillStyle = "rgba(255, 0, 0, 0.8)";
 				  }
 				  else
 				  {
@@ -499,7 +546,6 @@
 				  }
 				  ctx.lineWidth = 1;
 				  
-				  //ctx.strokeRect(((pos.x * 30) - (X * 30 / 2)), ((pos.y * 30) - (Y * 30 / 2)), X * 30, Y * 30);
 				  ctx.fillRect(((pos.x * 30) - (X * 30 / 2)), ((pos.y * 30) - (Y * 30 / 2)), X * 30, Y * 30);
 	 
 				  ctx.restore();
@@ -559,6 +605,7 @@
 					}
 					if(AUD=='bounce' && BUD=='obj')
 					{
+					bouncesound.play();
 					shouldbounce=1;
 					vspeed.x=wheel.GetLinearVelocity().x*2;
 					vspeed.y=wheel.GetLinearVelocity().y*2;
@@ -582,6 +629,7 @@
 					}
 					if(BUD=='bounce' && AUD=='obj')
 					{
+					bouncesound.play();
 					shouldbounce=1;
 					vx=wheel.GetLinearVelocity().x*2;
 					vy=wheel.GetLinearVelocity().y*2;
