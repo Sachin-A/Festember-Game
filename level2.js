@@ -101,6 +101,8 @@ function level2()
 			active();
 			if(died==true)
 				{
+					temp2=temp2died;
+					temp=tempdied;
 					wheel.SetPosition(start2);
 					died=false;
 				}

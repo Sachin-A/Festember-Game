@@ -149,6 +149,30 @@
     tempfix.friction = 0.5;
     tempfix.restitution = 0.6;
     tempfix.shape = new b2CircleShape(0.001 * (xlimit + ylimit) / (1200 + 900));
+	var tempdied = world.CreateBody(tempbody);
+    tempdied.CreateFixture(tempfix);
+	
+	var tempbody = new b2BodyDef();
+	tempbody.type = b2Body.b2_staticBody;
+    tempbody.position.Set(0,0);
+    tempbody.userData = 'null';
+	var tempfix = new b2FixtureDef();
+	tempfix.density = 10;
+    tempfix.friction = 0.5;
+    tempfix.restitution = 0.6;
+    tempfix.shape = new b2CircleShape(0.001 * (xlimit + ylimit) / (1200 + 900));
+	var temp2died = world.CreateBody(tempbody);
+    temp2died.CreateFixture(tempfix);
+	
+	var tempbody = new b2BodyDef();
+	tempbody.type = b2Body.b2_staticBody;
+    tempbody.position.Set(0,0);
+    tempbody.userData = 'null';
+	var tempfix = new b2FixtureDef();
+	tempfix.density = 10;
+    tempfix.friction = 0.5;
+    tempfix.restitution = 0.6;
+    tempfix.shape = new b2CircleShape(0.001 * (xlimit + ylimit) / (1200 + 900));
 	var portalbody = world.CreateBody(tempbody);
     portalbody.CreateFixture(tempfix);
 
