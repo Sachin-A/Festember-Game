@@ -324,11 +324,18 @@ function level3()
             {
                 ray();
             }
-            ctx.fillStyle = 'rgba(145,145,255,0.5)';
+            ctx.fillStyle = "rgba(0, 57, 255, 1)";
             ctx.beginPath();
             ctx.arc(winx3, winy3, 15 * (xlimit + ylimit) / (1200 + 900), 0, Math.PI * 2, false);
             ctx.closePath();
             ctx.fill();
+			if(a==15)a=0;
+			a=a+1;
+			ctx.strokeStyle = "rgba(255, 255, 255, 1)";
+			ctx.beginPath();
+			ctx.arc(winx3, winy3, a * (xlimit + ylimit) / (1200 + 900), 0, Math.PI * 2, false);
+			ctx.closePath();
+			ctx.stroke();
 			}
 			if(escape==true && instruc==false)
 			{
