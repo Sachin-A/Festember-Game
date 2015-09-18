@@ -134,7 +134,6 @@ function level1()
 				document.getElementById('instructions').style.display='none';
 				document.getElementById('canvas').style.backgroundColor='rgba(0, 0, 44, 0.8)';
 				world.Step(1 / 60, 10, 10);
-				//world.DrawDebugData();
 				draw();
 				world.SetContactListener(listener);
 				world.ClearForces();
@@ -176,13 +175,12 @@ function level1()
 				ctx.clearRect(0,0, canvas.width, canvas.height);
 				end=true;
 				window.cancelAnimationFrame(frame1);
-				//level1();
 			}
-			if(Math.sqrt(Math.pow(wheel.GetPosition().x * scale - winx1, 2) + Math.pow(wheel.GetPosition().y * scale - winy1, 2))>50 && end==false && lives>0)
+			if(Math.sqrt(Math.pow(wheel.GetPosition().x * scale - winx1, 2) + Math.pow(wheel.GetPosition().y * scale - winy1, 2))>50 && end==false)
 				{
 					var frame1 = window.requestAnimationFrame(update1);
 				}
-			if(Math.sqrt(Math.pow(wheel.GetPosition().x * scale - winx1, 2) + Math.pow(wheel.GetPosition().y * scale - winy1, 2))<50 && end==false && lives>0)
+			if(Math.sqrt(Math.pow(wheel.GetPosition().x * scale - winx1, 2) + Math.pow(wheel.GetPosition().y * scale - winy1, 2))<50 && end==false)
 				{
 					document.getElementById('conveyori').style.display='none';
 					wheel.SetLinearVelocity(zero);
