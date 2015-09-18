@@ -201,6 +201,7 @@ function level4()
 				bset=0;
 				count=0;
 				document.getElementById('bouncei').style.display='none';
+				ga('send', 'pageview');
                 level1();
             }
         };
