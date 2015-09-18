@@ -166,11 +166,18 @@ function level4()
                 ctx.closePath();
                 ctx.fill();
             }
-			ctx.fillStyle = 'rgba(145,145,255,0.5)';
+			ctx.fillStyle = "rgba(0, 57, 255, 1)";
             ctx.beginPath();
-            ctx.arc(winx4, winy4, 30 * (xlimit + ylimit) / (1200 + 900), 0, Math.PI * 2, false);
+            ctx.arc(winx4, winy4, 15 * (xlimit + ylimit) / (1200 + 900), 0, Math.PI * 2, false);
             ctx.closePath();
             ctx.fill();
+			if(a==15)a=0;
+			a=a+1;
+			ctx.strokeStyle = "rgba(255, 255, 255, 1)";
+			ctx.beginPath();
+			ctx.arc(winx4, winy4, a * (xlimit + ylimit) / (1200 + 900), 0, Math.PI * 2, false);
+			ctx.closePath();
+			ctx.stroke();
             if (scope == 1)
                 ray();
 			}
@@ -201,7 +208,6 @@ function level4()
 				bset=0;
 				count=0;
 				document.getElementById('bouncei').style.display='none';
-				ga('send', 'pageview');
                 level1();
             }
         };
