@@ -5,8 +5,10 @@ function level1()
             if (b != wheel && b!=border1 && b!=border2 && b!=border3 && b!=border4)
                 world.DestroyBody(b);
         }
+		level.play();
 		time=60000;
 		levelnumber=1;
+		playlevel(levelnumber);
 		$("#single2").html("<p>Level: " +levelnumber + "</p>");
 		$("#time").html("Time left: " +time);
 		$("#lives").html("Time left: " +lives);
@@ -149,15 +151,22 @@ function level1()
 					attach();
 					ctx.fillStyle = "rgba(255,255,255,0.1)";
 					ctx.beginPath();
-					ctx.arc(wheel.GetPosition().x * scale, wheel.GetPosition().y * scale, 2 * scale, 0, Math.PI * 2, false);
+					ctx.arc(wheel.GetPosition().x * scale, wheel.GetPosition().y * scale, 1.2 * scale, 0, Math.PI * 2, false);
 					ctx.closePath();
 					ctx.fill();
 				}
-				ctx.fillStyle = 'rgba(145,145,255,0.5)';
+				ctx.fillStyle = "rgba(0, 57, 255, 1)";
 				ctx.beginPath();
-				ctx.arc(winx1, winy1, 30 * (xlimit + ylimit) / (1200 + 900), 0, Math.PI * 2, false);
+				ctx.arc(winx1, winy1, 15 * (xlimit + ylimit) / (1200 + 900), 0, Math.PI * 2, false);
 				ctx.closePath();
 				ctx.fill();
+				if(a==15)a=0;
+				a=a+1;
+				ctx.strokeStyle = "rgba(255, 255, 255, 1)";
+				ctx.beginPath();
+				ctx.arc(winx1, winy1, a * (xlimit + ylimit) / (1200 + 900), 0, Math.PI * 2, false);
+				ctx.closePath();
+				ctx.stroke();
 				if (scope == 1)
 					ray();
 			
@@ -179,6 +188,20 @@ function level1()
 			if(Math.sqrt(Math.pow(wheel.GetPosition().x * scale - winx1, 2) + Math.pow(wheel.GetPosition().y * scale - winy1, 2))>50 && end==false)
 				{
 					var frame1 = window.requestAnimationFrame(update1);
+					/*window.requestAnimFrame = function()
+					{
+						return (
+								window.requestAnimationFrame       || 
+								window.webkitRequestAnimationFrame || 
+								window.mozRequestAnimationFrame    || 
+								window.oRequestAnimationFrame      || 
+								window.msRequestAnimationFrame     || 
+								function(update1)
+								{
+									window.setTimeout(update1, 1000 / 60);
+								}
+								);
+					}();*/
 				}
 			if(Math.sqrt(Math.pow(wheel.GetPosition().x * scale - winx1, 2) + Math.pow(wheel.GetPosition().y * scale - winy1, 2))<50 && end==false)
 				{
@@ -188,6 +211,7 @@ function level1()
 					rset=0;
 					bset=0;
 					count=0;
+					playlevel(0);
 					level2();
 				}
         };
