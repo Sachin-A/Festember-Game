@@ -77,13 +77,13 @@
 	var a=0;
 	
 	//music
-	var blueshoot = new Audio("blueportalshoot.mp3"); //blue portal shooting sound
-	var redshoot = new Audio("redportalshoot.mp3"); //red portal shooting sound
-	var level = new Audio("Level.mp3")//level gameplay music
+	var blueshoot = new Audio("media/blueportalshoot.mp3"); //blue portal shooting sound
+	var redshoot = new Audio("media/redportalshoot.mp3"); //red portal shooting sound
+	var level = new Audio("media/Level.mp3")//level gameplay music
 	level.volume=0.5;
-	var warp = new Audio("warp.mp3")//portal warping music
-	var bouncesound = new Audio("bouncesound.mp3")//blue box bounce music
-	var menu = new Audio("menu.mp3")//level gameplay music
+	var warp = new Audio("media/warp.mp3")//portal warping music
+	var bouncesound = new Audio("media/bouncesound.mp3")//blue box bounce music
+	var menu = new Audio("media/menu.mp3")//level gameplay music
 	
 	//music functions
 	
