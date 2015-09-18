@@ -75,6 +75,9 @@
 	var time;
 	var lives=3;
 	
+	//music
+	var shoot = new Audio("shootportal.mp3"); // portal shooting sound
+	
 	var tempbody = new b2BodyDef();
 	tempbody.type = b2Body.b2_staticBody;
     tempbody.position.Set(0,0);
@@ -304,12 +307,14 @@
 			case 1:if(scope==1)
 					{		
 					if(bcreate==0)bcreate=1;
+					shoot.play();
 					}
 					break;
 			case 2:break;
 			case 3:if(scope==1)
 					{		
 					if(rcreate==0)rcreate=1;
+					shoot.play();
 					}
 					break;
 			default:break;
